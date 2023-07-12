@@ -1,1 +1,2 @@
 # CATVehicle-Track-Generate
+Working to create dynamic encryption key generation based on the entropy of traffic within a shared FOV. This porject is being done by students working at the University of Arizona CAT Vehcile REU under UROC.
