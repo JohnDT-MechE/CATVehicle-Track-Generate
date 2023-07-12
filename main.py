@@ -104,6 +104,7 @@ while True:
     bbox_id=tracker.update(list)
     for bbox in bbox_id:
         x3,y3,x4,y4,id=bbox
+        # Use Bottom Midpoint later to experiment, but keep midpoints to test against it
         current_center_x=int(x3+x4)//2
         current_center_y=int(y3+y4)//2
         
