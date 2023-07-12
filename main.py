@@ -142,8 +142,8 @@ while True:
     cout = (len(counter_out))
     
     #displays the counts of cars in and out using openCV
-    cv2.putText(frame,('In: ')+str(cin),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('Out: ')+str(cout),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('In: ')+str(cin),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('Out: ')+str(cout),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
     #shows the images
     cv2.imshow("RGB", frame)
