@@ -38,15 +38,15 @@ tracker=Tracker()
 # For long_range_b.mp4
 cy1=323 # Y-Coordinates for upper Line
 cy2=333 # Y-Coordinates for lower Line
-offset1=4
-offset2=6
+offset1=4 # Offset for upper Line
+offset2=6 # Offset for lower Line
 
 # General Code
-vh_in = {}
-vh_out = {}
+vh_in = {} # Holds IDs of cars going into frame for tracking
+vh_out = {} # Holds IDs of cars going out of frame for tracking
 
-counter_in = []
-counter_out = []
+counter_in = [] # List of IDs of cars that have gone into frame
+counter_out = [] # List of IDs of cars that have come out of frame
 
 while True:    
     ret,frame = cap.read()
@@ -76,6 +76,7 @@ while True:
         d=int(row[5])
         c=class_list[d]
         # Define what classes of objects to look for and record coordinates
+        # Add more if needed (stick to streetside objects)
         if 'car' in c:
             list.append([x1,y1,x2,y2])
         if 'truck' in c:
@@ -87,6 +88,7 @@ while True:
         if 'motorcycle' in c:
             list.append([x1,y1,x2,y2])
             
+    # Finds the midpoint of the bounding box        
     bbox_id=tracker.update(list)
     for bbox in bbox_id:
         x3,y3,x4,y4,id=bbox
@@ -112,13 +114,8 @@ while True:
                 cv2.putText(frame,str(id),(cx,cy),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out:
                     counter_out.append(id)
-                    
         
         
-        # cv2.circle(frame,(cx,cy),4,(0,0,255),-1)
-        # cv2.putText(frame,str(id),(cx,cy),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2)
-           
-
 # For long_range_b.mp4
     cv2.line(frame,(184,cy1),(814,cy1),(255,255,255),1) # X-Coordinates for upper Line
     cv2.putText(frame,('1Line'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
@@ -131,8 +128,8 @@ while True:
     cout = (len(counter_out))
     
     
-    cv2.putText(frame,('In:')+str(cin),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('Out:')+str(cout),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('In: ')+str(cin),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('Out: ')+str(cout),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
     cv2.imshow("RGB", frame)
     if cv2.waitKey(1)&0xFF==27:
