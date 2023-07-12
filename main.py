@@ -38,6 +38,7 @@ tracker=Tracker()
 # For long_range_b.mp4
 coord_y1=323 # Y-Coordinates for upper Line
 coord_y2=333 # Y-Coordinates for lower Line
+
 offset1=4 # Offset for upper Line
 offset2=6 # Offset for lower Line
 
