@@ -25,19 +25,31 @@ cv2.setMouseCallback('RGB', RGB)
 # Describe name of video being used
 cap=cv2.VideoCapture('long_range_b.mp4')
 
+#get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
+size = (1020, 500)
+   
+# Below VideoWriter object will create a frame of above defined
+# The output is stored in 'filename.avi' file.
+# you have to add this to your .gitignore file (add the line below)
+# output.*
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('output.avi',fourcc, 10.0, (1050,500))
 
+#read the classes yolov8 identifies
 my_file = open("coco.txt", "r")
 data = my_file.read()
 class_list = data.split("\n") 
-#print(class_list)
 
+
+#establish a counter variable for the number of frames that have passed in the video
 count=0
-
+#create a new tracker opbject - idk wth this does, because there were no comments when I got here
 tracker=Tracker()
 
 # For long_range_b.mp4
 coord_y1=323 # Y-Coordinates for upper Line
 coord_y2=333 # Y-Coordinates for lower Line
+
 offset1=4 # Offset for upper Line
 offset2=6 # Offset for lower Line
 
@@ -99,37 +111,38 @@ while True:
 
         if c in relevant_classes:
             list.append([x1,y1,x2,y2])
-            
+    
     # Finds the midpoint of the bounding box        
     bbox_id=tracker.update(list)
     for bbox in bbox_id:
         x3,y3,x4,y4,id=bbox
         # Use Bottom Midpoint later to experiment, but keep midpoints to test against it
-        current_center_x=int(x3+x4)//2
-        current_center_y=int(y3+y4)//2
+        center_x=int(x3+x4)//2
+        center_y=int(y3+y4)//2
         
         # Counting vehicles going "in" to frame
-        if coord_y1 < (current_center_y+offset1) and coord_y1 > (current_center_y-offset1):
-            vh_in[id] = current_center_y
+        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
+            vh_in[id] = center_y
         if id in vh_in:
-            if coord_y2 < (current_center_y+offset2) and coord_y2 > (current_center_y-offset2):
-                cv2.circle(frame,(current_center_x,current_center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(current_center_x,current_center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
+                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in:
                     counter_in.append(id)
                     
         # Counting vehicles going "out" of frame
-        if coord_y2 < (current_center_y+offset2) and coord_y2 > (current_center_y-offset2):
-            vh_out[id] = current_center_y
+        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
+            vh_out[id] = center_y
         if id in vh_out:
-            if coord_y1 < (current_center_y+offset1) and coord_y1 > (current_center_y-offset1):
-                cv2.circle(frame,(current_center_x,current_center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(current_center_x,current_center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
+                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out:
                     counter_out.append(id)
         
         
-    # For long_range_b.mp4
+    #For long_range_b.mp4
+    #this part just annotates the frame
     cv2.line(frame,(184,coord_y1),(814,coord_y1),(255,255,255),1) # X-Coordinates for upper Line
     cv2.putText(frame,('1Line'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
     
@@ -145,12 +158,15 @@ while True:
     cv2.putText(frame,('In: ')+str(cin),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     cv2.putText(frame,('Out: ')+str(cout),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
-    #shows the images
+    #shows the images and writes it to the video writer
+    out.write(frame)
+
     cv2.imshow("RGB", frame)
     if cv2.waitKey(1)&0xFF==27:
         break
 
 #close the display window
 cap.release()
+out.release()
 cv2.destroyAllWindows()
 
