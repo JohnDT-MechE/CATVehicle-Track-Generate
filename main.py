@@ -273,4 +273,4 @@ cv2.destroyAllWindows()
 
 print(data)
 #save the data
-np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s')
+np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event", comment="")

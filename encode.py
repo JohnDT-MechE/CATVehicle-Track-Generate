@@ -28,8 +28,8 @@ def encode(filename, flipped=False):
         gray=i^(i>>1)
         gray_code[i] = "{0:0{1}b}".format(gray,5)
 
-    normal_map = {0: '0', 1: '1'}
-    reverse_map = {0: '1', 1: '0'}
+    normal_map = {0: '00', 1: '01', 2:'10', 3:'11'}
+    reverse_map = {0: '10', 1: '11', 2:'00', 3:'01'}
 
 
     code = ''
