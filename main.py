@@ -239,19 +239,19 @@ for _ in tqdm.tqdm(range(vid_length)):
     cv2.putText(frame,('2Line'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
     # Left Cutoff lower Line in Red
-    cv2.line(frame,(x2L,coord_y2),(x2R_cutoff,coord_y2),(0,0,255),1) # X-Coordinates for upper Line Left
-    cv2.putText(frame,('2LineLeft'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
+    cv2.line(frame,(x2L,coord_y2),(x2R_cutoff,coord_y2),(0,0,255),1) # X-Coordinates for lower Line Left
+    cv2.putText(frame,('2LineLeft'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above lower Line
     
     # Right Cutoff lower Line in Blue
-    cv2.line(frame,(x2L_cutoff,coord_y2),(x2R,coord_y2),(255,0,0),1) # X-Coordinates for lower Line
+    cv2.line(frame,(x2L_cutoff,coord_y2),(x2R,coord_y2),(255,0,0),1) # X-Coordinates for lower Line Right
     cv2.putText(frame,('2LineRight'),(x1R,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
     # General Code
     #gets the number of cars in and out by counting the length of the arrays
-    cin_Left = (len(counter_in_left))
-    cout_Left = (len(counter_out_left))
-    cin_Right = (len(counter_in_right))
-    cout_Right = (len(counter_out_right))
+    cin_Left = (len(counter_in_left)) # counter for in left
+    cout_Left = (len(counter_out_left)) # counter for out left
+    cin_Right = (len(counter_in_right)) # counter for in right
+    cout_Right = (len(counter_out_right)) # counter for out right
     
     #displays the counts of cars in and out using openCV
     cv2.putText(frame,('inLeft: ')+str(cin_Left),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
@@ -271,6 +271,7 @@ cap.release()
 out.release()
 cv2.destroyAllWindows()
 
+# print data to terminal
 print(data)
-#save the data
+# save the data to data.csv
 np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event", comment="")
