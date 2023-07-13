@@ -57,16 +57,37 @@ tracker=Tracker()
 # For long_range_b.mp4
 coord_y1=323 # Y-Coordinates for upper Line
 coord_y2=333 # Y-Coordinates for lower Line
+x1L=184 # Left-Side of X-Coordinates of upper Line
+x1R=814 # Right-Side of X-Coordinates of upper Line
+x2L=10 # Left-Side of X-Coordinates of lower Line
+x2R=1007 # Right-Side of X-Coordinates of lower Line
+
+
+# For Left Side
+x1R_cutoff=410
+x2R_cutoff=370
+
+# For Right Side
+x1L_cutoff=435
+x2L_cutoff=443
 
 offset1=4 # Offset for upper Line
 offset2=6 # Offset for lower Line
+offset3=4 # Offset for X-Axis
 
 # General Code
-vh_in = {} # Holds IDs of cars going into frame for tracking
-vh_out = {} # Holds IDs of cars going out of frame for tracking
+vh_in_left = {} # Holds IDs of cars going into frame on Left for tracking
+vh_out_left = {} # Holds IDs of cars going out of frame on Left for tracking
 
-counter_in = [] # List of IDs of cars that have gone into frame
-counter_out = [] # List of IDs of cars that have come out of frame
+vh_in_right = {} # Holds IDs of cars going into frame on Right for tracking
+vh_out_right = {} # Holds IDs of cars going out of frame on Right for tracking
+
+
+counter_in_left = [] # List of IDs of cars that have gone into frame on Left
+counter_out_left = [] # List of IDs of cars that have come out of frame on Left
+
+counter_in_right = [] # List of IDs of cars that have gone into frame on Right
+counter_out_right = [] # List of IDs of cars that have gone out of frame on Right
 
 #create a list to hold the events we will use to generate data
 #end goal is to get this so we can store it in a csv file to use later to have more flexibility when we experiment with our data detection
@@ -131,56 +152,113 @@ for _ in tqdm.tqdm(range(vid_length)):
         center_x=int(x3+x4)//2
         center_y=int(y3+y4)//2
         
-        # Counting vehicles going "in" to frame
-        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
-            vh_in[id] = center_y
-        if id in vh_in:
+        # LEFT SIDE
+        # Counting vehicles going "inLeft" to frame
+        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L-offset3) and center_x < (x1R_cutoff+offset3):
+            vh_in_left[id] = center_y
+        if id in vh_in_left:
             if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
-                if id not in counter_in:
-                    counter_in.append(id)
+                if id not in counter_in_left:
+                    counter_in_left.append(id)
                     #this is where we know a new event occured, because the counter was just incremented
                     #first we get the time the event occured. count/30 is the number of seconds since the video started
                     event_time = start_time + count/30
                     event_time = int(event_time*100) / 100
                     #now append that to data
-                    data.append((event_time, 'in'))
+                    data.append((event_time, 'in left'))
 
                     
-        # Counting vehicles going "out" of frame
-        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
-            vh_out[id] = center_y
-        if id in vh_out:
+        # Counting vehicles going "outLeft" of frame
+        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L-offset3) and center_x < (x2R_cutoff+offset3):
+            vh_out_left[id] = center_y
+        if id in vh_out_left:
             if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
-                if id not in counter_out:
-                    counter_out.append(id)
+                if id not in counter_out_left:
+                    counter_out_left.append(id)
                     #we know a new event occured here, because this is where the counter is incremented
                     #first we get the time the event occured. count/30 is the number of seconds since the video started
                     event_time = start_time + count/30
                     event_time = int(event_time*100)/100
                     #now append that to data
-                    data.append((event_time, 'out'))
+                    data.append((event_time, 'out left'))
+                    
+                    
+        # RIGHT SIDE
+        # Counting vehicles going "inRight" to frame
+        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L-offset3) and center_x < (x1R_cutoff+offset3):
+            vh_in_left[id] = center_y
+        if id in vh_in_left:
+            if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
+                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                if id not in counter_in_left:
+                    counter_in_left.append(id)
+                    #this is where we know a new event occured, because the counter was just incremented
+                    #first we get the time the event occured. count/30 is the number of seconds since the video started
+                    event_time = start_time + count/30
+                    event_time = int(event_time*100) / 100
+                    #now append that to data
+                    data.append((event_time, 'in Right'))
+                    
+        # Counting vehicles going "outRight" of frame
+        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L-offset3) and center_x < (x2R_cutoff+offset3):
+            vh_out_left[id] = center_y
+        if id in vh_out_left:
+            if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
+                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                if id not in counter_out_left:
+                    counter_out_left.append(id)
+                    #we know a new event occured here, because this is where the counter is incremented
+                    #first we get the time the event occured. count/30 is the number of seconds since the video started
+                    event_time = start_time + count/30
+                    event_time = int(event_time*100)/100
+                    #now append that to data
+                    data.append((event_time, 'out Right'))
         
         
     #For long_range_b.mp4
     #this part just annotates the frame
-    cv2.line(frame,(184,coord_y1),(814,coord_y1),(255,255,255),1) # X-Coordinates for upper Line
+    # Total upper Line
+    cv2.line(frame,(x1L,coord_y1),(x1R,coord_y1),(255,255,255),1) # X-Coordinates for upper Line
     cv2.putText(frame,('1Line'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
     
-    cv2.line(frame,(10,coord_y2),(1007,coord_y2),(255,255,255),1) # X-Coordinates for lower Line
+    # Left Cutoff upper Line in Red
+    cv2.line(frame,(x1L,coord_y1),(x1R_cutoff,coord_y1),(0,0,255),1) # X-Coordinates for upper Line Left
+    cv2.putText(frame,('1LineLeft'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
+    
+    # Right Cutoff upper Line in Blue
+    cv2.line(frame,(x1L_cutoff,coord_y1),(x1R,coord_y1),(255,0,0),1) # X-Coordinates for upper Line
+    cv2.putText(frame,('1LineRight'),(x1R,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
+    
+    # Total lower Line
+    cv2.line(frame,(x2L,coord_y2),(x2R,coord_y2),(255,255,255),1) # X-Coordinates for lower Line
     cv2.putText(frame,('2Line'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    
+    # Left Cutoff lower Line in Red
+    cv2.line(frame,(x2L,coord_y2),(x2R_cutoff,coord_y2),(0,0,255),1) # X-Coordinates for upper Line Left
+    cv2.putText(frame,('2LineLeft'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
+    
+    # Right Cutoff lower Line in Blue
+    cv2.line(frame,(x2L_cutoff,coord_y2),(x2R,coord_y2),(255,0,0),1) # X-Coordinates for lower Line
+    cv2.putText(frame,('2LineRight'),(x1R,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
     # General Code
     #gets the number of cars in and out by counting the length of the arrays
-    cin = (len(counter_in))
-    cout = (len(counter_out))
+    cin_Left = (len(counter_in_left))
+    cout_Left = (len(counter_out_left))
+    cin_Right = (len(counter_in_right))
+    cout_Right = (len(counter_out_right))
     
     #displays the counts of cars in and out using openCV
-    cv2.putText(frame,('In: ')+str(cin),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('Out: ')+str(cout),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('inLeft: ')+str(cin_Left),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('outLeft: ')+str(cout_Left),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('inRight: ')+str(cin_Left),(860,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('outRight: ')+str(cout_Left),(860,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
     #shows the images and writes it to the video writer
     out.write(frame)
