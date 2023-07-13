@@ -32,13 +32,14 @@ cap=cv2.VideoCapture('long_range_b.mp4')
 #get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
 size = (1020, 500)
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
    
 # Below VideoWriter object will create a frame of above defined
 # The output is stored in 'filename.avi' file.
 # you have to add this to your .gitignore file (add the line below)
 # output.*
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('output.avi',fourcc, 10.0, (1050,500))
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter('output.mp4',fourcc, 10.0, size)
 
 
 
