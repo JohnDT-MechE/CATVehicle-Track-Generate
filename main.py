@@ -13,7 +13,7 @@ import time
 
 import tqdm
 
-model=YOLO('yolov8s.pt') # Change model if needed
+model=YOLO('yolov8l.pt') # Change model if needed
 
 
 
