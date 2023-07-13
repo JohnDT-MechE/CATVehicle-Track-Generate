@@ -2,22 +2,38 @@ import pandas as pd
 import numpy as np
 
 #read in the csv file
-filename = "data.csv"
+file = "data.csv"
 
-df = pd.read_csv(filename)
+gray_code = {}
+for i in range(0, 1<<5):
+    gray=i^(i>>1)
+    gray_code[i] = "{0:0{1}b}".format(gray,5)
 
-shape = df.shape
-
-#get a dictionary mapping each event to a unique id
-unique_dict = {}
-for index, event_type in enumerate({c: df[c].unique() for c in df}['event']):
-    unique_dict[event_type] = index
+normal_map = {0: '0', 1: '1'}
+reverse_map = {0: '1', 1: '0'}
 
 
-#loop through the rows in the data
-for row_index in range(shape[0]):
-    time = df.iloc[row_index, 0]
-    event_type = unique_dict[df.iloc[row_index, 1]]
+def encode(filename, flipped=False):
+    df = pd.read_csv(filename)
 
-    print(time)
-    print(event_type)
+    shape = df.shape
+
+    #get a dictionary mapping each event to a unique id
+    unique_dict = {}
+    for index, event_type in enumerate({c: df[c].unique() for c in df}['event']):
+        unique_dict[event_type] = index
+
+
+    code = ''
+    #loop through the rows in the data
+    for row_index in range(shape[0]):
+        time = df.iloc[row_index, 0]
+        event_type = unique_dict[df.iloc[row_index, 1]]
+
+        code += gray_code[((int)(time/2) % 32)]
+        code += normal_map[event_type] if not flipped else reverse_map[event_type]
+
+    return code
+
+
+print(encode(file, flipped=False))
