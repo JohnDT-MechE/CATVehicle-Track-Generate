@@ -194,3 +194,5 @@ out.release()
 cv2.destroyAllWindows()
 
 print(data)
+#save the data
+np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s')
