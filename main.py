@@ -82,7 +82,6 @@ vh_out_left = {} # Holds IDs of cars going out of frame on Left for tracking
 vh_in_right = {} # Holds IDs of cars going into frame on Right for tracking
 vh_out_right = {} # Holds IDs of cars going out of frame on Right for tracking
 
-
 counter_in_left = [] # List of IDs of cars that have gone into frame on Left
 counter_out_left = [] # List of IDs of cars that have come out of frame on Left
 
@@ -189,36 +188,36 @@ for _ in tqdm.tqdm(range(vid_length)):
                     
         # RIGHT SIDE
         # Counting vehicles going "inRight" to frame
-        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L-offset3) and center_x < (x1R_cutoff+offset3):
-            vh_in_left[id] = center_y
-        if id in vh_in_left:
+        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L_cutoff-offset3) and center_x < (x2R+offset3):
+            vh_in_right[id] = center_y
+        if id in vh_in_right:
             if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
-                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
+                cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
-                if id not in counter_in_left:
-                    counter_in_left.append(id)
+                if id not in counter_in_right:
+                    counter_in_right.append(id)
                     #this is where we know a new event occured, because the counter was just incremented
                     #first we get the time the event occured. count/30 is the number of seconds since the video started
                     event_time = start_time + count/30
                     event_time = int(event_time*100) / 100
                     #now append that to data
-                    data.append((event_time, 'in Right'))
+                    data.append((event_time, 'in right'))
                     
         # Counting vehicles going "outRight" of frame
-        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L-offset3) and center_x < (x2R_cutoff+offset3):
-            vh_out_left[id] = center_y
-        if id in vh_out_left:
+        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L_cutoff-offset3) and center_x < (x2R+offset3):
+            vh_out_right[id] = center_y
+        if id in vh_out_right:
             if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
-                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
+                cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
-                if id not in counter_out_left:
-                    counter_out_left.append(id)
+                if id not in counter_out_right:
+                    counter_out_right.append(id)
                     #we know a new event occured here, because this is where the counter is incremented
                     #first we get the time the event occured. count/30 is the number of seconds since the video started
                     event_time = start_time + count/30
                     event_time = int(event_time*100)/100
                     #now append that to data
-                    data.append((event_time, 'out Right'))
+                    data.append((event_time, 'out right'))
         
         
     #For long_range_b.mp4
@@ -257,8 +256,8 @@ for _ in tqdm.tqdm(range(vid_length)):
     #displays the counts of cars in and out using openCV
     cv2.putText(frame,('inLeft: ')+str(cin_Left),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     cv2.putText(frame,('outLeft: ')+str(cout_Left),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('inRight: ')+str(cin_Left),(860,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('outRight: ')+str(cout_Left),(860,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('inRight: ')+str(cin_Right),(860,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('outRight: ')+str(cout_Right),(860,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
     
     #shows the images and writes it to the video writer
     out.write(frame)
