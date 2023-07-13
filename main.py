@@ -8,6 +8,10 @@ import pandas as pd
 import numpy as np
 from ultralytics import YOLO
 from tracker import*
+#idk why I'm actually importing this, we could just use a placeholder. Would feel weird though
+import time
+
+import tqdm
 
 model=YOLO('yolov8s.pt') # Change model if needed
 
@@ -27,6 +31,7 @@ cap=cv2.VideoCapture('long_range_b.mp4')
 
 #get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
 size = (1020, 500)
+vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
    
 # Below VideoWriter object will create a frame of above defined
 # The output is stored in 'filename.avi' file.
@@ -34,6 +39,8 @@ size = (1020, 500)
 # output.*
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output.avi',fourcc, 10.0, (1050,500))
+
+
 
 #read the classes yolov8 identifies
 my_file = open("coco.txt", "r")
@@ -60,12 +67,15 @@ vh_out = {} # Holds IDs of cars going out of frame for tracking
 counter_in = [] # List of IDs of cars that have gone into frame
 counter_out = [] # List of IDs of cars that have come out of frame
 
+#create a list to hold the events we will use to generate data
+#end goal is to get this so we can store it in a csv file to use later to have more flexibility when we experiment with our data detection
+data = []
+#start time in GMT unix time
+start_time = time.time()
+
 #infinitely loop through the video
-while True:    
+for _ in tqdm.tqdm(range(vid_length)):    
     ret,frame = cap.read()
-    #if the video is over, break out of the 'infinite' loop
-    if not ret:
-        break
 
     #this code exists to limit the number of frames the code actually looks at
     #counts the number of frames that have passed
@@ -79,7 +89,7 @@ while True:
    
 
     #run YOLOv8 on the frame
-    results=model.predict(frame)
+    results=model.predict(frame, verbose=False)
     #print(results)
     #get the data from the classification
     a=results[0].boxes.data
@@ -129,6 +139,13 @@ while True:
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in:
                     counter_in.append(id)
+                    #this is where we know a new event occured, because the counter was just incremented
+                    #first we get the time the event occured. count/30 is the number of seconds since the video started
+                    event_time = start_time + count/30
+                    event_time = int(event_time*100) / 100
+                    #now append that to data
+                    data.append((event_time, 'in'))
+
                     
         # Counting vehicles going "out" of frame
         if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
@@ -139,6 +156,12 @@ while True:
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out:
                     counter_out.append(id)
+                    #we know a new event occured here, because this is where the counter is incremented
+                    #first we get the time the event occured. count/30 is the number of seconds since the video started
+                    event_time = start_time + count/30
+                    event_time = int(event_time*100)/100
+                    #now append that to data
+                    data.append((event_time, 'out'))
         
         
     #For long_range_b.mp4
@@ -170,3 +193,6 @@ cap.release()
 out.release()
 cv2.destroyAllWindows()
 
+print(data)
+#save the data
+np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s')
