@@ -13,7 +13,7 @@ import time
 
 import tqdm
 
-model=YOLO('yolov8s.pt') # Change model if needed
+model=YOLO('yolov8l.pt') # Change model if needed
 
 
 
@@ -27,7 +27,8 @@ cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
 
 # Describe name of video being used
-cap=cv2.VideoCapture('long_range_b.mp4')
+#cap=cv2.VideoCapture('long_range_b.mp4')
+cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 
 #get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
 size = (1020, 500)
@@ -54,26 +55,51 @@ count=0
 #create a new tracker opbject - idk wth this does, because there were no comments when I got here
 tracker=Tracker()
 
-# For long_range_b.mp4
-coord_y1=323 # Y-Coordinates for upper Line
-coord_y2=333 # Y-Coordinates for lower Line
-x1L=184 # Left-Side of X-Coordinates of upper Line
-x1R=814 # Right-Side of X-Coordinates of upper Line
-x2L=10 # Left-Side of X-Coordinates of lower Line
-x2R=1007 # Right-Side of X-Coordinates of lower Line
+## START
+## For long_range_b.mp4
+#coord_y1=323 # Y-Coordinates for upper Line
+#coord_y2=333 # Y-Coordinates for lower Line
+#x1L=184 # Left-Side of X-Coordinates of upper Line
+#x1R=814 # Right-Side of X-Coordinates of upper Line
+#x2L=10 # Left-Side of X-Coordinates of lower Line
+#x2R=1007 # Right-Side of X-Coordinates of lower Line
 
 
 # For Left Side
-x1R_cutoff=410
-x2R_cutoff=370
+#x1R_cutoff=410
+#x2R_cutoff=370
 
 # For Right Side
-x1L_cutoff=435
-x2L_cutoff=443
+#x1L_cutoff=435
+#x2L_cutoff=443
 
-offset1=4 # Offset for upper Line
-offset2=6 # Offset for lower Line
+#offset1=4 # Offset for upper Line
+#offset2=6 # Offset for lower Line
+#offset3=4 # Offset for X-Axis
+## END
+
+## START
+## For realistic_FOV_T_60_edited.mp4
+coord_y1=317 # Y-Coordinates for upper Line
+coord_y2=332 # Y-Coordinates for lower Line
+x1L=135 # Left-Side of X-Coordinates of upper Line
+x1R=926 # Right-Side of X-Coordinates of upper Line
+x2L=14 # Left-Side of X-Coordinates of lower Line
+x2R=1018 # Right-Side of X-Coordinates of lower Line
+
+
+# For Left Side
+x1R_cutoff=487
+x2R_cutoff=462
+
+# For Right Side
+x1L_cutoff=561
+x2L_cutoff=590
+
+offset1=5 # Offset for upper Line
+offset2=5 # Offset for lower Line
 offset3=4 # Offset for X-Axis
+## END
 
 # General Code
 vh_in_left = {} # Holds IDs of cars going into frame on Left for tracking
@@ -102,7 +128,7 @@ for _ in tqdm.tqdm(range(vid_length)):
     #counts the number of frames that have passed
     count += 1
     #if the number of frames isn't a multiple of three, skip to the next frame
-    if count % 3 != 0:
+    if count % 6 != 0:
         continue
     # For Tristan's recorded data it is at 60 FPS for all videos so we need to look at every 6 frames
     # For My recorded data, all but one is at 30 FPS so we need to look at every 3 frames and I can let you know which one is which
@@ -155,7 +181,8 @@ for _ in tqdm.tqdm(range(vid_length)):
         x3,y3,x4,y4,id=bbox
         # Use Bottom Midpoint later to experiment, but keep midpoints to test against it
         center_x=int(x3+x4)//2
-        center_y=int(y3+y4)//2
+        #center_y=int(y3+y4)//2
+        center_y=y4
         
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
