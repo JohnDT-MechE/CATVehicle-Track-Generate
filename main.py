@@ -29,6 +29,7 @@ cv2.setMouseCallback('RGB', RGB)
 # Describe name of video being used
 #cap=cv2.VideoCapture('long_range_b.mp4')
 cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
+#cap=cv2.VideoCapture('realistic_FOV_J_30_edited.mp4')
 
 #get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
 size = (1020, 500)
@@ -79,6 +80,7 @@ tracker=Tracker()
 ## END
 
 ## START
+## REAR FOV
 ## For realistic_FOV_T_60_edited.mp4
 coord_y1=317 # Y-Coordinates for upper Line
 coord_y2=332 # Y-Coordinates for lower Line
@@ -99,6 +101,32 @@ x2L_cutoff=590
 offset1=5 # Offset for upper Line
 offset2=5 # Offset for lower Line
 offset3=4 # Offset for X-Axis
+## END
+
+
+# Have not messed with these parameters yet
+## START
+## FRONT FOV
+## For realistic_FOV_J_30_edited.mp4
+#coord_y1=317 # Y-Coordinates for upper Line
+#coord_y2=332 # Y-Coordinates for lower Line
+#x1L=135 # Left-Side of X-Coordinates of upper Line
+#x1R=926 # Right-Side of X-Coordinates of upper Line
+#x2L=14 # Left-Side of X-Coordinates of lower Line
+#x2R=1018 # Right-Side of X-Coordinates of lower Line
+
+
+# For Left Side
+#x1R_cutoff=487
+#x2R_cutoff=462
+
+# For Right Side
+#x1L_cutoff=561
+#x2L_cutoff=590
+
+#offset1=5 # Offset for upper Line
+#offset2=5 # Offset for lower Line
+#offset3=4 # Offset for X-Axis
 ## END
 
 # General Code
@@ -179,9 +207,11 @@ for _ in tqdm.tqdm(range(vid_length)):
     bbox_id=tracker.update(list)
     for bbox in bbox_id:
         x3,y3,x4,y4,id=bbox
-        # Use Bottom Midpoint later to experiment, but keep midpoints to test against it
+        # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
+        # Uncomment line below for center point of bounding box
         #center_y=int(y3+y4)//2
+        # Uncomment line below for center point of bottom y-axis of bounding box
         center_y=y4
         
         # LEFT SIDE
