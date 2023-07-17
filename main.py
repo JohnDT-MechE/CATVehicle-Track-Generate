@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 13 July 2023
+# Last updated 17 July 2023
 
 import cv2
 import pandas as pd
@@ -28,7 +28,9 @@ cv2.setMouseCallback('RGB', RGB)
 
 # Describe name of video being used
 #cap=cv2.VideoCapture('long_range_b.mp4')
+# REAR FOV
 cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
+# FRONT FOV
 #cap=cv2.VideoCapture('realistic_FOV_J_30_edited.mp4')
 
 #get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
@@ -56,6 +58,7 @@ count=0
 #create a new tracker opbject - idk wth this does, because there were no comments when I got here
 tracker=Tracker()
 
+#-------------------------------------------------------------------------------------------------
 ## START
 ## For long_range_b.mp4
 #coord_y1=323 # Y-Coordinates for upper Line
@@ -78,7 +81,8 @@ tracker=Tracker()
 #offset2=6 # Offset for lower Line
 #offset3=4 # Offset for X-Axis
 ## END
-
+#-------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------
 ## START
 ## REAR FOV
 ## For realistic_FOV_T_60_edited.mp4
@@ -102,8 +106,8 @@ offset1=5 # Offset for upper Line
 offset2=5 # Offset for lower Line
 offset3=4 # Offset for X-Axis
 ## END
-
-
+#-------------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------
 # Have not messed with these parameters yet
 ## START
 ## FRONT FOV
@@ -128,7 +132,7 @@ offset3=4 # Offset for X-Axis
 #offset2=5 # Offset for lower Line
 #offset3=4 # Offset for X-Axis
 ## END
-
+#-------------------------------------------------------------------------------------------------
 # General Code
 vh_in_left = {} # Holds IDs of cars going into frame on Left for tracking
 vh_out_left = {} # Holds IDs of cars going out of frame on Left for tracking
