@@ -5,7 +5,7 @@ from ultralytics import YOLO
 from tracker import*
 import time
 from math import dist
-model=YOLO('yolov8s.pt')
+model=YOLO('yolov8l.pt')
 
 
 
