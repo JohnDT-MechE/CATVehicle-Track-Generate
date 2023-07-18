@@ -36,7 +36,7 @@ cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 # We should consider going back to a 16:9 aspect ratio because this appears to squish the footage,
 # which could negatively impact detection performance
 # size = (1020, 500)
-size = (1920, 1080)
+size = (1920, 1080) # can reset to size above if it misses too many vehicles even as we configure it better
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 framerate = int(cap.get(cv2.CAP_PROP_FPS))
 
