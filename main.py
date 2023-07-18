@@ -14,7 +14,7 @@ import tqdm
 from tracker import*
 from counter import Counter, DataWriter
 
-model=YOLO('yolov8l.pt') # Change model if needed
+model=YOLO('yolov8s.pt') # Change model if needed
 
 def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE :  
@@ -31,7 +31,10 @@ cap=cv2.VideoCapture('long_range_b.mp4')
 # FRONT FOV
 #cap=cv2.VideoCapture('realistic_FOV_J_30_edited.mp4')
 
-#get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
+# resolution of the video capture this is also used to trim each frame later on
+# I am not entirely sure why it uses this wacky resolution
+# We should consider going back to a 16:9 aspect ratio because this appears to squish the footage,
+# which could negatively impact detection performance
 size = (1020, 500)
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 #framerate = int(cap.get(cv2.CAP_PROP_XI_FRAMERATE))
@@ -128,7 +131,7 @@ for _ in tqdm.tqdm(range(vid_length)):
 
 
     #resize the frame
-    frame=cv2.resize(frame,(1020,500))
+    frame=cv2.resize(frame,size)
    
     #run YOLOv8 on the frame
     results=model.predict(frame, verbose=False)
@@ -154,13 +157,13 @@ for _ in tqdm.tqdm(range(vid_length)):
         #I don't know what this is for and one letter variables certainly don't help --___--
         d=int(row[5])
         #get the class of the object
-        c=class_list[d]
+        object_class=class_list[d]
 
         # Define what classes of objects to look for and record coordinates
         # Add more if needed (stick to streetside objects)
         relevant_classes = ['car', 'truck', 'bus', 'bicycle', 'motorcycle']
 
-        if c in relevant_classes:
+        if object_class in relevant_classes:
             list.append([x1,y1,x2,y2])
     
     # gets all of the bounding boxes we are tracking    
@@ -185,7 +188,7 @@ for _ in tqdm.tqdm(range(vid_length)):
             #check if that object is now within the offset of the lower line
             if cl.within_lower_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_left:
                     counter_in_left.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
@@ -198,7 +201,7 @@ for _ in tqdm.tqdm(range(vid_length)):
         if id in vh_out_left:
             if cl.within_upper_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_left:
                     counter_out_left.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
@@ -215,7 +218,7 @@ for _ in tqdm.tqdm(range(vid_length)):
             #now check if the id is within the offset of the lower line
             if cr.within_lower_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_right:
                     counter_in_right.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
@@ -227,15 +230,14 @@ for _ in tqdm.tqdm(range(vid_length)):
         if id in vh_out_right:
             if cr.within_upper_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_right:
                     counter_out_right.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
                     data_writer.add_event('out right', start_time + count/framerate)
         
         
-    #For long_range_b.mp4
-    #this part just annotates the frame
+    #this part annotates the lines on the frame
     cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255))
     cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(255,0,0))
     

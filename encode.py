@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-#read in the csv file
-file = "data.csv"
-
 
 def encode(filename, flipped=False):
     """
@@ -43,5 +40,8 @@ def encode(filename, flipped=False):
 
     return code
 
-
-print(encode(file, flipped=False))
+#only run this code if we are running the file on its own, otherwise just let whatever code called encode
+#handle the input and output to the function
+if __name__ == "__main__":
+    file = "data.csv"
+    print(encode(file, flipped=False))
