@@ -2,4 +2,5 @@ output.*
 *.MOV
 *.mp4
 *.pt
+*.avi
 *.csv

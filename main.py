@@ -43,8 +43,9 @@ framerate = int(cap.get(cv2.CAP_PROP_FPS))
 # The output is stored in 'filename.avi' file.
 # you have to add this to your .gitignore file (add the line below)
 # output.*
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter('front_perspective_ultrawide.mp4',fourcc, 10.0, size)
+out = cv2.VideoWriter('filename.avi', 
+                         cv2.VideoWriter_fourcc(*'MJPG'),
+                         10, size)
 
 #read the classes yolov8 identifies
 my_file = open("coco.txt", "r")
