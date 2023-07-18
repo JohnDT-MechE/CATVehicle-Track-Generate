@@ -1,5 +1,6 @@
 output.*
 *.MOV
+*.mov
 *.mp4
 *.pt
 *.avi
