@@ -9,6 +9,7 @@ import numpy as np
 from ultralytics import YOLO
 import time
 import tqdm
+import json
 
 #custom classes
 from tracker import*
@@ -23,6 +24,12 @@ def RGB(event, x, y, flags, param):
 
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
+
+#Code to parse the configurations from the configurations.json file
+with open("configurations.json") as configuration:
+    config = json.load(configuration)
+    print(config)
+
 
 # Describe name of video being used
 #cap=cv2.VideoCapture('long_range_b.mp4')
@@ -130,7 +137,6 @@ for _ in tqdm.tqdm(range(vid_length)):
     count += 1
     #this limits the effective framerate of what we are looking at to 10, which seems to be sufficient
     #automatically gets the framerate of the video being used with opencv
-    #TODO: actually implement the "automatic" part of this
     if count % (framerate/10) != 0:
         continue
     # For Tristan's recorded data it is at 60 FPS for all videos so we need to look at every 6 frames

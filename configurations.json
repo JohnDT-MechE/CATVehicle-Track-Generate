@@ -1,0 +1,27 @@
+{
+    "ultrawide_front": {
+        "video_source": "realistic_FOV_T_60_edited.mp4",
+        "video_output": "front_perspective.avi",
+        "data_output": "data_front_ultrawide.csv",
+        "width": 1920,
+        "height": 1080,
+        "left_line": {
+            "upper_1": [685, 254],
+            "upper_2": [706, 917],
+            "lower_1": [717, 26],
+            "lower_2": [738, 869],
+            "offx": 8,
+            "offuy": 11,
+            "offly": 11
+        },
+        "right_line": {
+            "upper_1": [719, 1056],
+            "upper_2": [698, 1743],
+            "lower_1": [741,1110],
+            "lower_2": [719, 1916],
+            "offx": 8,
+            "offuy": 11,
+            "offly": 11
+        }
+    }
+}
