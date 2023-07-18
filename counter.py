@@ -6,6 +6,9 @@ class Counter:
         """
         Initializes a counter object, which stores the coordinates for two lines and contains functions to detect when
         coordinates are close to either line and to draw the lines out on a frame
+
+        upper and lower lines are both defined by their two endpoints, (x1, y1) and (x2, y2)
+        x offset is the same for both upper and lower lines, and y offsets are unique
         """
         self.upper_y1 = uy1
         self.upper_y2 = uy2

@@ -7,26 +7,19 @@ import cv2
 import pandas as pd
 import numpy as np
 from ultralytics import YOLO
+import time
+import tqdm
 
 #custom classes
 from tracker import*
 from counter import Counter
 
-
-#idk why I'm actually importing this, we could just use a placeholder. Would feel weird though
-import time
-
-import tqdm
-
 model=YOLO('yolov8l.pt') # Change model if needed
-
-
 
 def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE :  
         colorsBGR = [x, y]
         print(colorsBGR)
-        
 
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
@@ -41,8 +34,10 @@ cap=cv2.VideoCapture('long_range_b.mp4')
 #get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
 size = (1020, 500)
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+#framerate = int(cap.get(cv2.CAP_PROP_XI_FRAMERATE))
+#rint(framerate)
+framerate=30
 
-   
 # Below VideoWriter object will create a frame of above defined
 # The output is stored in 'filename.avi' file.
 # you have to add this to your .gitignore file (add the line below)
@@ -50,13 +45,10 @@ vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter('output.mp4',fourcc, 10.0, size)
 
-
-
 #read the classes yolov8 identifies
 my_file = open("coco.txt", "r")
 data = my_file.read()
 class_list = data.split("\n") 
-
 
 #establish a counter variable for the number of frames that have passed in the video
 count=0
@@ -64,89 +56,41 @@ count=0
 tracker=Tracker()
 
 #create two new counters, one for the left and one for the right
-cl = Counter(uy1 = 323, uy2 = 333, ux1=184, ux2=410,
-            ly1 = 333, ly2 = 343, lx1=10, lx2=370)
+#low key I'm not convinced this is any more readable than the way it was stored before
+#but classes are cool, and it lets us do other cool things like diagonals and the code can be 
+#cleaner, so I guess that's cool
 
-cr = Counter(uy1 = 333, uy2 = 323, ux1=435, ux2=814,
-            ly1 = 343, ly2 = 333, lx1=443, lx2=1007)
+#the u stands for upper, and point 1 should be on the left and point 2 on the right (though I don't think it actually matters)
 
 #-------------------------------------------------------------------------------------------------
 ## START
 ## For long_range_b.mp4
-coord_y1=323 # Y-Coordinates for upper Line
-coord_y2=333 # Y-Coordinates for lower Line
-x1L=184 # Left-Side of X-Coordinates of upper Line
-x1R=814 # Right-Side of X-Coordinates of upper Line
-x2L=10 # Left-Side of X-Coordinates of lower Line
-x2R=1007 # Right-Side of X-Coordinates of lower Line
-
-
-# For Left Side
-x1R_cutoff=410
-x2R_cutoff=370
-
-# For Right Side
-x1L_cutoff=435
-x2L_cutoff=443
-
-offset1=4 # Offset for upper Line
-offset2=6 # Offset for lower Line
-offset3=4 # Offset for X-Axis
+cl = Counter(uy1 = 323, uy2 = 333, ux1=184, ux2=410,
+            ly1 = 333, ly2 = 343, lx1=10, lx2=370)
+cr = Counter(uy1 = 333, uy2 = 323, ux1=435, ux2=814,
+            ly1 = 343, ly2 = 333, lx1=443, lx2=1007)
 ## END
-#-------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------
 ## START
 ## REAR FOV
 ## For realistic_FOV_T_60_edited.mp4
-#coord_y1=317 # Y-Coordinates for upper Line
-#coord_y2=332 # Y-Coordinates for lower Line
-#x1L=135 # Left-Side of X-Coordinates of upper Line
-#x1R=926 # Right-Side of X-Coordinates of upper Line
-#x2L=14 # Left-Side of X-Coordinates of lower Line
-#x2R=1018 # Right-Side of X-Coordinates of lower Line
-
-
-# For Left Side
-#x1R_cutoff=487
-#x2R_cutoff=462
-
-# For Right Side
-#x1L_cutoff=561
-#x2L_cutoff=590
-
-#offset1=5 # Offset for upper Line
-#offset2=5 # Offset for lower Line
-#offset3=4 # Offset for X-Axis
+#cl = Counter(uy1 = 317, uy2 = 317, ux1=135, ux2=487,
+#            ly1 = 332, ly2 = 332, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
+#cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
+#            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
 ## END
-#-------------------------------------------------------------------------------------------------
-
-
 #-------------------------------------------------------------------------------------------------
 # Have not messed with these parameters yet
 ## START
 ## FRONT FOV
 ## For realistic_FOV_J_30_edited.mp4
-#coord_y1=317 # Y-Coordinates for upper Line
-#coord_y2=332 # Y-Coordinates for lower Line
-#x1L=135 # Left-Side of X-Coordinates of upper Line
-#x1R=926 # Right-Side of X-Coordinates of upper Line
-#x2L=14 # Left-Side of X-Coordinates of lower Line
-#x2R=1018 # Right-Side of X-Coordinates of lower Line
-
-
-# For Left Side
-#x1R_cutoff=487
-#x2R_cutoff=462
-
-# For Right Side
-#x1L_cutoff=561
-#x2L_cutoff=590
-
-#offset1=5 # Offset for upper Line
-#offset2=5 # Offset for lower Line
-#offset3=4 # Offset for X-Axis
+#cl = Counter(uy1 = 317, uy2 = 317, ux1=135, ux2=487,
+#            ly1 = 332, ly2 = 332, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
+#cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
+#            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
 ## END
 #-------------------------------------------------------------------------------------------------
+
 # General Code
 vh_in_left = {} # Holds IDs of cars going into frame on Left for tracking
 vh_out_left = {} # Holds IDs of cars going out of frame on Left for tracking
@@ -166,34 +110,32 @@ data = []
 #start time in GMT unix time
 start_time = time.time()
 
-#infinitely loop through the video
+#loop through the video
 for _ in tqdm.tqdm(range(vid_length)):    
     ret,frame = cap.read()
 
     #this code exists to limit the number of frames the code actually looks at
     #counts the number of frames that have passed
     count += 1
-    #if the number of frames isn't a multiple of three, skip to the next frame
-    if count % 6 != 0:
+    #this limits the effective framerate of what we are looking at to 10, which seems to be sufficient
+    #automatically gets the framerate of the video being used with opencv
+    #TODO: actually implement the "automatic" part of this
+    if count % (framerate/10) != 0:
         continue
     # For Tristan's recorded data it is at 60 FPS for all videos so we need to look at every 6 frames
     # For My recorded data, all but one is at 30 FPS so we need to look at every 3 frames and I can let you know which one is which
     # We can also pre-process the videos to make them 30 FPS each to ensure similar amounts of precision are being used
-    # This is my bad, we were kinda in a rush so I wasn't double checking the FPS being recorded in
-    # Regardless 30 FPS should be enough for the precision that we are looking for
-    
+
 
     #resize the frame
     frame=cv2.resize(frame,(1020,500))
    
-
     #run YOLOv8 on the frame
     results=model.predict(frame, verbose=False)
     #print(results)
     #get the data from the classification
     a=results[0].boxes.data
-    #create a dataframe of the results
-    #why the f**k does it use a two letter variable I hate this
+    #why the f**k does it use a two letter variable without at least an explanation I hate this
     px=pd.DataFrame(a).astype("float")
     #print(px)
     list=[]
