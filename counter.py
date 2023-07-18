@@ -1,4 +1,43 @@
 import cv2
+import numpy as np
+
+class DataWriter:
+
+    def __init__(self, filename=None):
+        """
+        Initialize with a csv file to store the data in
+        """
+        self.filename = filename
+        self.data = []
+
+    def add_event(self, event_type, time):
+        """
+        Gets event type (left_in, left_out, right_in, right_out) and unix time to the nearest 1000th
+        Rounds time to the nearest hundredth of a second and appends a tuple with time and event_type to
+        self.data
+        """
+        rounded_time = int(time*100) / 100
+        self.data.append((rounded_time, event_type))
+
+    def print(self):
+        """
+        prints out the data as a somewhat nicely formatted table to the terminal
+        """
+        #print a header
+        print('time: \t\tEvent Type:')
+        #iterate through the entries in self.data
+        for event in self.data:
+            #for each entry we iterate through, print out a formatted string with the time followed by the event type
+            print(f'{event[0]}\t\t{event[1]}')
+
+    def store_data(self, file=None):
+        """
+        Writes the data in self.data to the csv file specified in filename
+        """
+        
+        np.savetxt(file if file is not None else self.filename, [row for row in self.data], delimiter=',', fmt='%s', header="time,event", comments="")
+
+    
 
 class Counter:
 
@@ -62,9 +101,9 @@ class Counter:
         #draws upper line and label
         cv2.line(frame,(self.upper_x1,self.upper_y1),(self.upper_x2,self.upper_y2),color,2) # X-Coordinates for upper Line
         if labels:
-            cv2.putText(frame,(label_upper),((self.upper_x1+self.upper_x2)//2,(self.upper_y1+self.upper_y2)//2),cv2.FONT_HERSHEY_SIMPLEX,0.8,color,2) # Adds text above upper Line
+            cv2.putText(frame,(label_upper),((self.upper_x1+self.upper_x2)//2,(self.upper_y1+self.upper_y2)//2),cv2.FONT_HERSHEY_SIMPLEX,0.5,color,1) # Adds text above upper Line
 
         #draws lower line and label
         cv2.line(frame,(self.lower_x1,self.lower_y1),(self.lower_x2,self.lower_y2),color,2) # X-Coordinates for upper Line
         if labels:
-            cv2.putText(frame,(label_lower),((self.lower_x1+self.lower_x2)//2,(self.lower_y1+self.lower_y2)//2),cv2.FONT_HERSHEY_SIMPLEX,0.8,color,2) # Adds text above upper Line
+            cv2.putText(frame,(label_lower),((self.lower_x1+self.lower_x2)//2,(self.lower_y1+self.lower_y2)//2),cv2.FONT_HERSHEY_SIMPLEX,0.5,color,1) # Adds text above upper Line

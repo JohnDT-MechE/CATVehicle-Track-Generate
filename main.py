@@ -12,7 +12,7 @@ import tqdm
 
 #custom classes
 from tracker import*
-from counter import Counter
+from counter import Counter, DataWriter
 
 model=YOLO('yolov8l.pt') # Change model if needed
 
@@ -104,9 +104,9 @@ counter_out_left = [] # List of IDs of cars that have come out of frame on Left
 counter_in_right = [] # List of IDs of cars that have gone into frame on Right
 counter_out_right = [] # List of IDs of cars that have gone out of frame on Right
 
-#create a list to hold the events we will use to generate data
-#end goal is to get this so we can store it in a csv file to use later to have more flexibility when we experiment with our data detection
-data = []
+#create a new instance of the datawriter class to record the data we gather
+data_writer = DataWriter("data_long_range_b.csv")
+
 #start time in GMT unix time
 start_time = time.time()
 
@@ -188,12 +188,8 @@ for _ in tqdm.tqdm(range(vid_length)):
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_left:
                     counter_in_left.append(id)
-                    #this is where we know a new event occured, because the counter was just incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100) / 100
-                    #now append that to data
-                    data.append((event_time, 'in left'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('in left', start_time + count/framerate)
 
                     
         # Counting vehicles going "outLeft" of frame
@@ -205,12 +201,8 @@ for _ in tqdm.tqdm(range(vid_length)):
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_left:
                     counter_out_left.append(id)
-                    #we know a new event occured here, because this is where the counter is incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100)/100
-                    #now append that to data
-                    data.append((event_time, 'out left'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('out left', start_time + count/framerate)
                     
                     
         # RIGHT SIDE
@@ -226,12 +218,8 @@ for _ in tqdm.tqdm(range(vid_length)):
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_right:
                     counter_in_right.append(id)
-                    #this is where we know a new event occured, because the counter was just incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100) / 100
-                    #now append that to data
-                    data.append((event_time, 'in right'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('in right', start_time + count/framerate)
                     
         # Counting vehicles going "outRight" of frame
         if cr.within_lower_line(center_x, center_y):
@@ -242,18 +230,14 @@ for _ in tqdm.tqdm(range(vid_length)):
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_right:
                     counter_out_right.append(id)
-                    #we know a new event occured here, because this is where the counter is incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100)/100
-                    #now append that to data
-                    data.append((event_time, 'out right'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('out right', start_time + count/framerate)
         
         
     #For long_range_b.mp4
     #this part just annotates the frame
-    cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255), labels=False)
-    cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(0,255,0), labels=False)
+    cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255))
+    cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(255,0,0))
     
     # General Code
     #gets the number of cars in and out by counting the length of the arrays
@@ -263,10 +247,10 @@ for _ in tqdm.tqdm(range(vid_length)):
     cout_Right = (len(counter_out_right)) # counter for out right
     
     #displays the counts of cars in and out using openCV
-    cv2.putText(frame,('inLeft: ')+str(cin_Left),(40,20),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
-    cv2.putText(frame,('outLeft: ')+str(cout_Left),(40,60),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
-    cv2.putText(frame,('inRight: ')+str(cin_Right),(840,20),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
-    cv2.putText(frame,('outRight: ')+str(cout_Right),(840,60),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
+    cv2.putText(frame,('inLeft: ')+str(cin_Left),(40,30),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
+    cv2.putText(frame,('outLeft: ')+str(cout_Left),(40,70),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
+    cv2.putText(frame,('inRight: ')+str(cin_Right),(840,30),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
+    cv2.putText(frame,('outRight: ')+str(cout_Right),(840,70),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
     
     #shows the images and writes it to the video writer
     out.write(frame)
@@ -280,8 +264,4 @@ cap.release()
 out.release()
 cv2.destroyAllWindows()
 
-# print data to terminal
-print(data)
-# save the data to data.csv
-#np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event", comment="")
-np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event")
+data_writer.store_data()
