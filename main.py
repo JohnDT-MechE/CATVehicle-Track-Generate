@@ -25,11 +25,11 @@ cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
 
 # Describe name of video being used
-cap=cv2.VideoCapture('long_range_b.mp4')
+#cap=cv2.VideoCapture('long_range_b.mp4')
 # REAR FOV
 #cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 # FRONT FOV
-#cap=cv2.VideoCapture('realistic_FOV_J_30_edited.mp4')
+cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 
 # resolution of the video capture this is also used to trim each frame later on
 # I am not entirely sure why it uses this wacky resolution
@@ -37,16 +37,14 @@ cap=cv2.VideoCapture('long_range_b.mp4')
 # which could negatively impact detection performance
 size = (1020, 500)
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-#framerate = int(cap.get(cv2.CAP_PROP_XI_FRAMERATE))
-#rint(framerate)
-framerate=30
+framerate = int(cap.get(cv2.CAP_PROP_FPS))
 
 # Below VideoWriter object will create a frame of above defined
 # The output is stored in 'filename.avi' file.
 # you have to add this to your .gitignore file (add the line below)
 # output.*
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter('output.mp4',fourcc, 10.0, size)
+out = cv2.VideoWriter('front_perspective_ultrawide.mp4',fourcc, 10.0, size)
 
 #read the classes yolov8 identifies
 my_file = open("coco.txt", "r")
@@ -67,30 +65,37 @@ tracker=Tracker()
 
 #-------------------------------------------------------------------------------------------------
 ## START
-## For long_range_b.mp4
-cl = Counter(uy1 = 323, uy2 = 333, ux1=184, ux2=410,
-            ly1 = 333, ly2 = 343, lx1=10, lx2=370)
-cr = Counter(uy1 = 333, uy2 = 323, ux1=435, ux2=814,
-            ly1 = 343, ly2 = 333, lx1=443, lx2=1007)
+## For long_range_b.mp4 (1020, 500)
+#cl = Counter(uy1 = 323, uy2 = 333, ux1=184, ux2=410,
+#            ly1 = 333, ly2 = 343, lx1=10, lx2=370)
+#cr = Counter(uy1 = 333, uy2 = 323, ux1=435, ux2=814,
+#            ly1 = 343, ly2 = 333, lx1=443, lx2=1007)
 ## END
 #-------------------------------------------------------------------------------------------------
 ## START
 ## REAR FOV
 ## For realistic_FOV_T_60_edited.mp4
-#cl = Counter(uy1 = 317, uy2 = 317, ux1=135, ux2=487,
-#            ly1 = 332, ly2 = 332, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
-#cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
-#            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
+
+# (1020, 500)
+cl = Counter(uy1 = 317, uy2 = 327, ux1=135, ux2=487,
+            ly1 = 332, ly2 = 342, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
+cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
+            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
+
+# (1920, 1080)
+#cl = Counter(uy1 = 630, uy2 = 830, ux1=250, ux2=600,
+#            ly1 = 670, ly2 = 870, lx1=240, lx2=580, offx=4, offuy=5, offly=5)
+#cr = Counter(uy1 = 830, uy2 = 630, ux1=1320, ux2=1870,
+#            ly1 = 870, ly2 = 670, lx1=1330, lx2=1880, offx=4, offuy=5, offly=5)
 ## END
 #-------------------------------------------------------------------------------------------------
-# Have not messed with these parameters yet
 ## START
 ## FRONT FOV
 ## For realistic_FOV_J_30_edited.mp4
-#cl = Counter(uy1 = 317, uy2 = 317, ux1=135, ux2=487,
-#            ly1 = 332, ly2 = 332, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
-#cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
-#            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
+#cl = Counter(uy1 = 500, uy2 = 600, ux1=100, ux2=800,
+#            ly1 = 540, ly2 = 640, lx1=80, lx2=780, offx=4, offuy=5, offly=5)
+#cr = Counter(uy1 = 600, uy2 = 500, ux1=1120, ux2=1820,
+#            ly1 = 640, ly2 = 540, lx1=1130, lx2=1830, offx=4, offuy=5, offly=5)
 ## END
 #-------------------------------------------------------------------------------------------------
 
@@ -108,7 +113,7 @@ counter_in_right = [] # List of IDs of cars that have gone into frame on Right
 counter_out_right = [] # List of IDs of cars that have gone out of frame on Right
 
 #create a new instance of the datawriter class to record the data we gather
-data_writer = DataWriter("data_long_range_b.csv")
+data_writer = DataWriter("data_ultrawide_rear.csv")
 
 #start time in GMT unix time
 start_time = time.time()
