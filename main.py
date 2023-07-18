@@ -179,21 +179,23 @@ for _ in tqdm.tqdm(range(vid_length)):
         # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
         # Uncomment line below for center point of bounding box
-        #center_y=int(y3+y4)//2
+        mid_center_y=int(y3+y4)//2
         # Uncomment line below for center point of bottom y-axis of bounding box
-        center_y=y4
+        lower_center_y=y4
+        # Uncomment line below for center point of upper y-axis of bounding box
+        upper_center_y=y3
         
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
         #check if the object we are currently checking is within the offset of the upper line
-        if cl.within_upper_line(center_x, center_y):
-            vh_in_left[id] = center_y
+        if cl.within_upper_line(center_x, lower_center_y):
+            vh_in_left[id] = lower_center_y
         #check if the object was at one point within the offsets of the upper line
         if id in vh_in_left:
             #check if that object is now within the offset of the lower line
-            if cl.within_lower_line(center_x, center_y):
-                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cl.within_lower_line(center_x, lower_center_y):
+                cv2.circle(frame,(center_x,lower_center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,lower_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_left:
                     counter_in_left.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
@@ -201,12 +203,12 @@ for _ in tqdm.tqdm(range(vid_length)):
 
                     
         # Counting vehicles going "outLeft" of frame
-        if cl.within_lower_line(center_x, center_y):
-            vh_out_left[id] = center_y
+        if cl.within_lower_line(center_x, upper_center_y):
+            vh_out_left[id] = upper_center_y
         if id in vh_out_left:
-            if cl.within_upper_line(center_x, center_y):
-                cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cl.within_upper_line(center_x, upper_center_y):
+                cv2.circle(frame,(center_x,upper_center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,upper_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_left:
                     counter_out_left.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
@@ -216,26 +218,26 @@ for _ in tqdm.tqdm(range(vid_length)):
         # RIGHT SIDE
         # Counting vehicles going "inRight" to frame
         #check if the current vehicle is within the offset of the upper line
-        if cr.within_upper_line(center_x, center_y):
-            vh_in_right[id] = center_y
+        if cr.within_upper_line(center_x, lower_center_y):
+            vh_in_right[id] = lower_center_y
         #check if the id was at one point within the offset of the upper line
         if id in vh_in_right:
             #now check if the id is within the offset of the lower line
-            if cr.within_lower_line(center_x, center_y):
-                cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cr.within_lower_line(center_x, lower_center_y):
+                cv2.circle(frame,(center_x,lower_center_y),4,(255,0,0),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,lower_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_right:
                     counter_in_right.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
                     data_writer.add_event('in right', start_time + count/framerate)
                     
         # Counting vehicles going "outRight" of frame
-        if cr.within_lower_line(center_x, center_y):
-            vh_out_right[id] = center_y
+        if cr.within_lower_line(center_x, upper_center_y):
+            vh_out_right[id] = upper_center_y
         if id in vh_out_right:
-            if cr.within_upper_line(center_x, center_y):
-                cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cr.within_upper_line(center_x, upper_center_y):
+                cv2.circle(frame,(center_x,upper_center_y),4,(255,0,0),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,upper_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_right:
                     counter_out_right.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
