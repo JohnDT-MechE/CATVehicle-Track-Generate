@@ -7,7 +7,12 @@ import cv2
 import pandas as pd
 import numpy as np
 from ultralytics import YOLO
+
+#custom classes
 from tracker import*
+from counter import Counter
+
+
 #idk why I'm actually importing this, we could just use a placeholder. Would feel weird though
 import time
 
@@ -27,9 +32,9 @@ cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
 
 # Describe name of video being used
-#cap=cv2.VideoCapture('long_range_b.mp4')
+cap=cv2.VideoCapture('long_range_b.mp4')
 # REAR FOV
-cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
+#cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 # FRONT FOV
 #cap=cv2.VideoCapture('realistic_FOV_J_30_edited.mp4')
 
@@ -55,58 +60,67 @@ class_list = data.split("\n")
 
 #establish a counter variable for the number of frames that have passed in the video
 count=0
-#create a new tracker opbject - idk wth this does, because there were no comments when I got here
+#create a new tracker opbject - this keeps track of which objects are actively crossing the lines
 tracker=Tracker()
+
+#create two new counters, one for the left and one for the right
+cl = Counter(uy1 = 323, uy2 = 333, ux1=184, ux2=410,
+            ly1 = 333, ly2 = 343, lx1=10, lx2=370)
+
+cr = Counter(uy1 = 333, uy2 = 323, ux1=435, ux2=814,
+            ly1 = 343, ly2 = 333, lx1=443, lx2=1007)
 
 #-------------------------------------------------------------------------------------------------
 ## START
 ## For long_range_b.mp4
-#coord_y1=323 # Y-Coordinates for upper Line
-#coord_y2=333 # Y-Coordinates for lower Line
-#x1L=184 # Left-Side of X-Coordinates of upper Line
-#x1R=814 # Right-Side of X-Coordinates of upper Line
-#x2L=10 # Left-Side of X-Coordinates of lower Line
-#x2R=1007 # Right-Side of X-Coordinates of lower Line
+coord_y1=323 # Y-Coordinates for upper Line
+coord_y2=333 # Y-Coordinates for lower Line
+x1L=184 # Left-Side of X-Coordinates of upper Line
+x1R=814 # Right-Side of X-Coordinates of upper Line
+x2L=10 # Left-Side of X-Coordinates of lower Line
+x2R=1007 # Right-Side of X-Coordinates of lower Line
 
 
 # For Left Side
-#x1R_cutoff=410
-#x2R_cutoff=370
+x1R_cutoff=410
+x2R_cutoff=370
 
 # For Right Side
-#x1L_cutoff=435
-#x2L_cutoff=443
+x1L_cutoff=435
+x2L_cutoff=443
 
-#offset1=4 # Offset for upper Line
-#offset2=6 # Offset for lower Line
-#offset3=4 # Offset for X-Axis
+offset1=4 # Offset for upper Line
+offset2=6 # Offset for lower Line
+offset3=4 # Offset for X-Axis
 ## END
 #-------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------
 ## START
 ## REAR FOV
 ## For realistic_FOV_T_60_edited.mp4
-coord_y1=317 # Y-Coordinates for upper Line
-coord_y2=332 # Y-Coordinates for lower Line
-x1L=135 # Left-Side of X-Coordinates of upper Line
-x1R=926 # Right-Side of X-Coordinates of upper Line
-x2L=14 # Left-Side of X-Coordinates of lower Line
-x2R=1018 # Right-Side of X-Coordinates of lower Line
+#coord_y1=317 # Y-Coordinates for upper Line
+#coord_y2=332 # Y-Coordinates for lower Line
+#x1L=135 # Left-Side of X-Coordinates of upper Line
+#x1R=926 # Right-Side of X-Coordinates of upper Line
+#x2L=14 # Left-Side of X-Coordinates of lower Line
+#x2R=1018 # Right-Side of X-Coordinates of lower Line
 
 
 # For Left Side
-x1R_cutoff=487
-x2R_cutoff=462
+#x1R_cutoff=487
+#x2R_cutoff=462
 
 # For Right Side
-x1L_cutoff=561
-x2L_cutoff=590
+#x1L_cutoff=561
+#x2L_cutoff=590
 
-offset1=5 # Offset for upper Line
-offset2=5 # Offset for lower Line
-offset3=4 # Offset for X-Axis
+#offset1=5 # Offset for upper Line
+#offset2=5 # Offset for lower Line
+#offset3=4 # Offset for X-Axis
 ## END
 #-------------------------------------------------------------------------------------------------
+
+
 #-------------------------------------------------------------------------------------------------
 # Have not messed with these parameters yet
 ## START
@@ -207,9 +221,10 @@ for _ in tqdm.tqdm(range(vid_length)):
         if c in relevant_classes:
             list.append([x1,y1,x2,y2])
     
-    # Finds the midpoint of the bounding box        
+    # gets all of the bounding boxes we are tracking    
     bbox_id=tracker.update(list)
     for bbox in bbox_id:
+        # gets the coordinates of the relevant bounding box
         x3,y3,x4,y4,id=bbox
         # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
@@ -220,10 +235,13 @@ for _ in tqdm.tqdm(range(vid_length)):
         
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
-        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L-offset3) and center_x < (x1R_cutoff+offset3):
+        #check if the object we are currently checking is within the offset of the upper line
+        if cl.within_upper_line(center_x, center_y):
             vh_in_left[id] = center_y
+        #check if the object was at one point within the offsets of the upper line
         if id in vh_in_left:
-            if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
+            #check if that object is now within the offset of the lower line
+            if cl.within_lower_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_left:
@@ -237,10 +255,10 @@ for _ in tqdm.tqdm(range(vid_length)):
 
                     
         # Counting vehicles going "outLeft" of frame
-        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L-offset3) and center_x < (x2R_cutoff+offset3):
+        if cl.within_lower_line(center_x, center_y):
             vh_out_left[id] = center_y
         if id in vh_out_left:
-            if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
+            if cl.within_upper_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_left:
@@ -255,10 +273,13 @@ for _ in tqdm.tqdm(range(vid_length)):
                     
         # RIGHT SIDE
         # Counting vehicles going "inRight" to frame
-        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L_cutoff-offset3) and center_x < (x2R+offset3):
+        #check if the current vehicle is within the offset of the upper line
+        if cr.within_upper_line(center_x, center_y):
             vh_in_right[id] = center_y
+        #check if the id was at one point within the offset of the upper line
         if id in vh_in_right:
-            if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
+            #now check if the id is within the offset of the lower line
+            if cr.within_lower_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_right:
@@ -271,10 +292,10 @@ for _ in tqdm.tqdm(range(vid_length)):
                     data.append((event_time, 'in right'))
                     
         # Counting vehicles going "outRight" of frame
-        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L_cutoff-offset3) and center_x < (x2R+offset3):
+        if cr.within_lower_line(center_x, center_y):
             vh_out_right[id] = center_y
         if id in vh_out_right:
-            if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
+            if cr.within_upper_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
                 cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_right:
@@ -289,29 +310,8 @@ for _ in tqdm.tqdm(range(vid_length)):
         
     #For long_range_b.mp4
     #this part just annotates the frame
-    # Total upper Line
-    cv2.line(frame,(x1L,coord_y1),(x1R,coord_y1),(255,255,255),1) # X-Coordinates for upper Line
-    cv2.putText(frame,('1Line'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
-    
-    # Left Cutoff upper Line in Red
-    cv2.line(frame,(x1L,coord_y1),(x1R_cutoff,coord_y1),(0,0,255),1) # X-Coordinates for upper Line Left
-    cv2.putText(frame,('1LineLeft'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
-    
-    # Right Cutoff upper Line in Blue
-    cv2.line(frame,(x1L_cutoff,coord_y1),(x1R,coord_y1),(255,0,0),1) # X-Coordinates for upper Line
-    cv2.putText(frame,('1LineRight'),(x1R,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
-    
-    # Total lower Line
-    cv2.line(frame,(x2L,coord_y2),(x2R,coord_y2),(255,255,255),1) # X-Coordinates for lower Line
-    cv2.putText(frame,('2Line'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    
-    # Left Cutoff lower Line in Red
-    cv2.line(frame,(x2L,coord_y2),(x2R_cutoff,coord_y2),(0,0,255),1) # X-Coordinates for lower Line Left
-    cv2.putText(frame,('2LineLeft'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above lower Line
-    
-    # Right Cutoff lower Line in Blue
-    cv2.line(frame,(x2L_cutoff,coord_y2),(x2R,coord_y2),(255,0,0),1) # X-Coordinates for lower Line Right
-    cv2.putText(frame,('2LineRight'),(x1R,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255), labels=False)
+    cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(0,255,0), labels=False)
     
     # General Code
     #gets the number of cars in and out by counting the length of the arrays
@@ -321,15 +321,15 @@ for _ in tqdm.tqdm(range(vid_length)):
     cout_Right = (len(counter_out_right)) # counter for out right
     
     #displays the counts of cars in and out using openCV
-    cv2.putText(frame,('inLeft: ')+str(cin_Left),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('outLeft: ')+str(cout_Left),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('inRight: ')+str(cin_Right),(860,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('outRight: ')+str(cout_Right),(860,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('inLeft: ')+str(cin_Left),(40,20),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
+    cv2.putText(frame,('outLeft: ')+str(cout_Left),(40,60),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
+    cv2.putText(frame,('inRight: ')+str(cin_Right),(840,20),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
+    cv2.putText(frame,('outRight: ')+str(cout_Right),(840,60),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2)
     
     #shows the images and writes it to the video writer
     out.write(frame)
 
-    cv2.imshow("RGB", frame)
+    cv2.imshow("Detecting Vehicles", frame)
     if cv2.waitKey(1)&0xFF==27:
         break
 
@@ -341,4 +341,5 @@ cv2.destroyAllWindows()
 # print data to terminal
 print(data)
 # save the data to data.csv
-np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event", comment="")
+#np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event", comment="")
+np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event")
