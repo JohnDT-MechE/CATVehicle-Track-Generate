@@ -133,10 +133,6 @@ for _ in tqdm.tqdm(range(vid_length)):
     #TODO: actually implement the "automatic" part of this
     if count % (framerate/10) != 0:
         continue
-    # For Tristan's recorded data it is at 60 FPS for all videos so we need to look at every 6 frames
-    # For My recorded data, all but one is at 30 FPS so we need to look at every 3 frames and I can let you know which one is which
-    # We can also pre-process the videos to make them 30 FPS each to ensure similar amounts of precision are being used
-
 
     #resize the frame
     frame=cv2.resize(frame,size)
