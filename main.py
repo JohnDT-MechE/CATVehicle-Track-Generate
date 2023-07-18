@@ -7,21 +7,19 @@ import cv2
 import pandas as pd
 import numpy as np
 from ultralytics import YOLO
-from tracker import*
-#idk why I'm actually importing this, we could just use a placeholder. Would feel weird though
 import time
-
 import tqdm
 
-model=YOLO('yolov8l.pt') # Change model if needed
+#custom classes
+from tracker import*
+from counter import Counter, DataWriter
 
-
+model=YOLO('yolov8s.pt') # Change model if needed
 
 def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE :  
         colorsBGR = [x, y]
         print(colorsBGR)
-        
 
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
@@ -29,110 +27,78 @@ cv2.setMouseCallback('RGB', RGB)
 # Describe name of video being used
 #cap=cv2.VideoCapture('long_range_b.mp4')
 # REAR FOV
-cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
+#cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 # FRONT FOV
-#cap=cv2.VideoCapture('realistic_FOV_J_30_edited.mp4')
+cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 
-#get the resolution of the video capture - because this is trimmed later on, I got lazy and hard coded it 
+# resolution of the video capture this is also used to trim each frame later on
+# I am not entirely sure why it uses this wacky resolution
+# We should consider going back to a 16:9 aspect ratio because this appears to squish the footage,
+# which could negatively impact detection performance
 size = (1020, 500)
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+framerate = int(cap.get(cv2.CAP_PROP_FPS))
 
-   
 # Below VideoWriter object will create a frame of above defined
 # The output is stored in 'filename.avi' file.
 # you have to add this to your .gitignore file (add the line below)
 # output.*
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter('output.mp4',fourcc, 10.0, size)
-
-
+out = cv2.VideoWriter('front_perspective_ultrawide.mp4',fourcc, 10.0, size)
 
 #read the classes yolov8 identifies
 my_file = open("coco.txt", "r")
 data = my_file.read()
 class_list = data.split("\n") 
 
-
 #establish a counter variable for the number of frames that have passed in the video
 count=0
-#create a new tracker opbject - idk wth this does, because there were no comments when I got here
+#create a new tracker opbject - this keeps track of which objects are actively crossing the lines
 tracker=Tracker()
+
+#create two new counters, one for the left and one for the right
+#low key I'm not convinced this is any more readable than the way it was stored before
+#but classes are cool, and it lets us do other cool things like diagonals and the code can be 
+#cleaner, so I guess that's cool
+
+#the u stands for upper, and point 1 should be on the left and point 2 on the right (though I don't think it actually matters)
 
 #-------------------------------------------------------------------------------------------------
 ## START
-## For long_range_b.mp4
-#coord_y1=323 # Y-Coordinates for upper Line
-#coord_y2=333 # Y-Coordinates for lower Line
-#x1L=184 # Left-Side of X-Coordinates of upper Line
-#x1R=814 # Right-Side of X-Coordinates of upper Line
-#x2L=10 # Left-Side of X-Coordinates of lower Line
-#x2R=1007 # Right-Side of X-Coordinates of lower Line
-
-
-# For Left Side
-#x1R_cutoff=410
-#x2R_cutoff=370
-
-# For Right Side
-#x1L_cutoff=435
-#x2L_cutoff=443
-
-#offset1=4 # Offset for upper Line
-#offset2=6 # Offset for lower Line
-#offset3=4 # Offset for X-Axis
+## For long_range_b.mp4 (1020, 500)
+#cl = Counter(uy1 = 323, uy2 = 333, ux1=184, ux2=410,
+#            ly1 = 333, ly2 = 343, lx1=10, lx2=370)
+#cr = Counter(uy1 = 333, uy2 = 323, ux1=435, ux2=814,
+#            ly1 = 343, ly2 = 333, lx1=443, lx2=1007)
 ## END
-#-------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------
 ## START
 ## REAR FOV
 ## For realistic_FOV_T_60_edited.mp4
-coord_y1=317 # Y-Coordinates for upper Line
-coord_y2=332 # Y-Coordinates for lower Line
-x1L=135 # Left-Side of X-Coordinates of upper Line
-x1R=926 # Right-Side of X-Coordinates of upper Line
-x2L=14 # Left-Side of X-Coordinates of lower Line
-x2R=1018 # Right-Side of X-Coordinates of lower Line
 
+# (1020, 500)
+cl = Counter(uy1 = 317, uy2 = 327, ux1=135, ux2=487,
+            ly1 = 332, ly2 = 342, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
+cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
+            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
 
-# For Left Side
-x1R_cutoff=487
-x2R_cutoff=462
-
-# For Right Side
-x1L_cutoff=561
-x2L_cutoff=590
-
-offset1=5 # Offset for upper Line
-offset2=5 # Offset for lower Line
-offset3=4 # Offset for X-Axis
+# (1920, 1080)
+#cl = Counter(uy1 = 630, uy2 = 830, ux1=250, ux2=600,
+#            ly1 = 670, ly2 = 870, lx1=240, lx2=580, offx=4, offuy=5, offly=5)
+#cr = Counter(uy1 = 830, uy2 = 630, ux1=1320, ux2=1870,
+#            ly1 = 870, ly2 = 670, lx1=1330, lx2=1880, offx=4, offuy=5, offly=5)
 ## END
 #-------------------------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------------------------
-# Have not messed with these parameters yet
 ## START
 ## FRONT FOV
 ## For realistic_FOV_J_30_edited.mp4
-#coord_y1=317 # Y-Coordinates for upper Line
-#coord_y2=332 # Y-Coordinates for lower Line
-#x1L=135 # Left-Side of X-Coordinates of upper Line
-#x1R=926 # Right-Side of X-Coordinates of upper Line
-#x2L=14 # Left-Side of X-Coordinates of lower Line
-#x2R=1018 # Right-Side of X-Coordinates of lower Line
-
-
-# For Left Side
-#x1R_cutoff=487
-#x2R_cutoff=462
-
-# For Right Side
-#x1L_cutoff=561
-#x2L_cutoff=590
-
-#offset1=5 # Offset for upper Line
-#offset2=5 # Offset for lower Line
-#offset3=4 # Offset for X-Axis
+#cl = Counter(uy1 = 500, uy2 = 600, ux1=100, ux2=800,
+#            ly1 = 540, ly2 = 640, lx1=80, lx2=780, offx=4, offuy=5, offly=5)
+#cr = Counter(uy1 = 600, uy2 = 500, ux1=1120, ux2=1820,
+#            ly1 = 640, ly2 = 540, lx1=1130, lx2=1830, offx=4, offuy=5, offly=5)
 ## END
 #-------------------------------------------------------------------------------------------------
+
 # General Code
 vh_in_left = {} # Holds IDs of cars going into frame on Left for tracking
 vh_out_left = {} # Holds IDs of cars going out of frame on Left for tracking
@@ -146,40 +112,38 @@ counter_out_left = [] # List of IDs of cars that have come out of frame on Left
 counter_in_right = [] # List of IDs of cars that have gone into frame on Right
 counter_out_right = [] # List of IDs of cars that have gone out of frame on Right
 
-#create a list to hold the events we will use to generate data
-#end goal is to get this so we can store it in a csv file to use later to have more flexibility when we experiment with our data detection
-data = []
+#create a new instance of the datawriter class to record the data we gather
+data_writer = DataWriter("data_ultrawide_rear.csv")
+
 #start time in GMT unix time
 start_time = time.time()
 
-#infinitely loop through the video
+#loop through the video
 for _ in tqdm.tqdm(range(vid_length)):    
     ret,frame = cap.read()
 
     #this code exists to limit the number of frames the code actually looks at
     #counts the number of frames that have passed
     count += 1
-    #if the number of frames isn't a multiple of three, skip to the next frame
-    if count % 6 != 0:
+    #this limits the effective framerate of what we are looking at to 10, which seems to be sufficient
+    #automatically gets the framerate of the video being used with opencv
+    #TODO: actually implement the "automatic" part of this
+    if count % (framerate/10) != 0:
         continue
     # For Tristan's recorded data it is at 60 FPS for all videos so we need to look at every 6 frames
     # For My recorded data, all but one is at 30 FPS so we need to look at every 3 frames and I can let you know which one is which
     # We can also pre-process the videos to make them 30 FPS each to ensure similar amounts of precision are being used
-    # This is my bad, we were kinda in a rush so I wasn't double checking the FPS being recorded in
-    # Regardless 30 FPS should be enough for the precision that we are looking for
-    
+
 
     #resize the frame
-    frame=cv2.resize(frame,(1020,500))
+    frame=cv2.resize(frame,size)
    
-
     #run YOLOv8 on the frame
     results=model.predict(frame, verbose=False)
     #print(results)
     #get the data from the classification
     a=results[0].boxes.data
-    #create a dataframe of the results
-    #why the f**k does it use a two letter variable I hate this
+    #why the f**k does it use a two letter variable without at least an explanation I hate this
     px=pd.DataFrame(a).astype("float")
     #print(px)
     list=[]
@@ -198,18 +162,19 @@ for _ in tqdm.tqdm(range(vid_length)):
         #I don't know what this is for and one letter variables certainly don't help --___--
         d=int(row[5])
         #get the class of the object
-        c=class_list[d]
+        object_class=class_list[d]
 
         # Define what classes of objects to look for and record coordinates
         # Add more if needed (stick to streetside objects)
         relevant_classes = ['car', 'truck', 'bus', 'bicycle', 'motorcycle']
 
-        if c in relevant_classes:
+        if object_class in relevant_classes:
             list.append([x1,y1,x2,y2])
     
-    # Finds the midpoint of the bounding box        
+    # gets all of the bounding boxes we are tracking    
     bbox_id=tracker.update(list)
     for bbox in bbox_id:
+        # gets the coordinates of the relevant bounding box
         x3,y3,x4,y4,id=bbox
         # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
@@ -220,98 +185,66 @@ for _ in tqdm.tqdm(range(vid_length)):
         
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
-        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L-offset3) and center_x < (x1R_cutoff+offset3):
+        #check if the object we are currently checking is within the offset of the upper line
+        if cl.within_upper_line(center_x, center_y):
             vh_in_left[id] = center_y
+        #check if the object was at one point within the offsets of the upper line
         if id in vh_in_left:
-            if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
+            #check if that object is now within the offset of the lower line
+            if cl.within_lower_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_left:
                     counter_in_left.append(id)
-                    #this is where we know a new event occured, because the counter was just incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100) / 100
-                    #now append that to data
-                    data.append((event_time, 'in left'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('in left', start_time + count/framerate)
 
                     
         # Counting vehicles going "outLeft" of frame
-        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L-offset3) and center_x < (x2R_cutoff+offset3):
+        if cl.within_lower_line(center_x, center_y):
             vh_out_left[id] = center_y
         if id in vh_out_left:
-            if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
+            if cl.within_upper_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_left:
                     counter_out_left.append(id)
-                    #we know a new event occured here, because this is where the counter is incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100)/100
-                    #now append that to data
-                    data.append((event_time, 'out left'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('out left', start_time + count/framerate)
                     
                     
         # RIGHT SIDE
         # Counting vehicles going "inRight" to frame
-        if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1) and center_x > (x1L_cutoff-offset3) and center_x < (x2R+offset3):
+        #check if the current vehicle is within the offset of the upper line
+        if cr.within_upper_line(center_x, center_y):
             vh_in_right[id] = center_y
+        #check if the id was at one point within the offset of the upper line
         if id in vh_in_right:
-            if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2):
+            #now check if the id is within the offset of the lower line
+            if cr.within_lower_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_in_right:
                     counter_in_right.append(id)
-                    #this is where we know a new event occured, because the counter was just incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100) / 100
-                    #now append that to data
-                    data.append((event_time, 'in right'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('in right', start_time + count/framerate)
                     
         # Counting vehicles going "outRight" of frame
-        if coord_y2 < (center_y+offset2) and coord_y2 > (center_y-offset2) and center_x > (x2L_cutoff-offset3) and center_x < (x2R+offset3):
+        if cr.within_lower_line(center_x, center_y):
             vh_out_right[id] = center_y
         if id in vh_out_right:
-            if coord_y1 < (center_y+offset1) and coord_y1 > (center_y-offset1):
+            if cr.within_upper_line(center_x, center_y):
                 cv2.circle(frame,(center_x,center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+                cv2.putText(frame,str(id),(center_x,center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_right:
                     counter_out_right.append(id)
-                    #we know a new event occured here, because this is where the counter is incremented
-                    #first we get the time the event occured. count/30 is the number of seconds since the video started
-                    event_time = start_time + count/30
-                    event_time = int(event_time*100)/100
-                    #now append that to data
-                    data.append((event_time, 'out right'))
+                    #We know a new event occurred, so we now update the data writer with that information
+                    data_writer.add_event('out right', start_time + count/framerate)
         
         
-    #For long_range_b.mp4
-    #this part just annotates the frame
-    # Total upper Line
-    cv2.line(frame,(x1L,coord_y1),(x1R,coord_y1),(255,255,255),1) # X-Coordinates for upper Line
-    cv2.putText(frame,('1Line'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
-    
-    # Left Cutoff upper Line in Red
-    cv2.line(frame,(x1L,coord_y1),(x1R_cutoff,coord_y1),(0,0,255),1) # X-Coordinates for upper Line Left
-    cv2.putText(frame,('1LineLeft'),(184,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
-    
-    # Right Cutoff upper Line in Blue
-    cv2.line(frame,(x1L_cutoff,coord_y1),(x1R,coord_y1),(255,0,0),1) # X-Coordinates for upper Line
-    cv2.putText(frame,('1LineRight'),(x1R,318),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above upper Line
-    
-    # Total lower Line
-    cv2.line(frame,(x2L,coord_y2),(x2R,coord_y2),(255,255,255),1) # X-Coordinates for lower Line
-    cv2.putText(frame,('2Line'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    
-    # Left Cutoff lower Line in Red
-    cv2.line(frame,(x2L,coord_y2),(x2R_cutoff,coord_y2),(0,0,255),1) # X-Coordinates for lower Line Left
-    cv2.putText(frame,('2LineLeft'),(1,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2) # Adds text above lower Line
-    
-    # Right Cutoff lower Line in Blue
-    cv2.line(frame,(x2L_cutoff,coord_y2),(x2R,coord_y2),(255,0,0),1) # X-Coordinates for lower Line Right
-    cv2.putText(frame,('2LineRight'),(x1R,331),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    #this part annotates the lines on the frame
+    cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255))
+    cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(255,0,0))
     
     # General Code
     #gets the number of cars in and out by counting the length of the arrays
@@ -321,15 +254,15 @@ for _ in tqdm.tqdm(range(vid_length)):
     cout_Right = (len(counter_out_right)) # counter for out right
     
     #displays the counts of cars in and out using openCV
-    cv2.putText(frame,('inLeft: ')+str(cin_Left),(60,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('outLeft: ')+str(cout_Left),(60,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('inRight: ')+str(cin_Right),(860,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
-    cv2.putText(frame,('outRight: ')+str(cout_Right),(860,40),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(0,255,255),2)
+    cv2.putText(frame,('inLeft: ')+str(cin_Left),(40,30),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
+    cv2.putText(frame,('outLeft: ')+str(cout_Left),(40,70),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
+    cv2.putText(frame,('inRight: ')+str(cin_Right),(840,30),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
+    cv2.putText(frame,('outRight: ')+str(cout_Right),(840,70),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
     
     #shows the images and writes it to the video writer
     out.write(frame)
 
-    cv2.imshow("RGB", frame)
+    cv2.imshow("Detecting Vehicles", frame)
     if cv2.waitKey(1)&0xFF==27:
         break
 
@@ -338,7 +271,4 @@ cap.release()
 out.release()
 cv2.destroyAllWindows()
 
-# print data to terminal
-print(data)
-# save the data to data.csv
-np.savetxt('data.csv', [row for row in data], delimiter=',', fmt='%s', header="time,event", comment="")
+data_writer.store_data()
