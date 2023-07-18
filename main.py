@@ -203,12 +203,12 @@ for _ in tqdm.tqdm(range(vid_length)):
 
                     
         # Counting vehicles going "outLeft" of frame
-        if cl.within_lower_line(center_x, upper_center_y):
-            vh_out_left[id] = upper_center_y
+        if cl.within_lower_line(center_x, mid_center_y):
+            vh_out_left[id] = mid_center_y
         if id in vh_out_left:
-            if cl.within_upper_line(center_x, upper_center_y):
-                cv2.circle(frame,(center_x,upper_center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,upper_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cl.within_upper_line(center_x, mid_center_y):
+                cv2.circle(frame,(center_x,mid_center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,mid_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_left:
                     counter_out_left.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
@@ -232,12 +232,12 @@ for _ in tqdm.tqdm(range(vid_length)):
                     data_writer.add_event('in right', start_time + count/framerate)
                     
         # Counting vehicles going "outRight" of frame
-        if cr.within_lower_line(center_x, upper_center_y):
-            vh_out_right[id] = upper_center_y
+        if cr.within_lower_line(center_x, mid_center_y):
+            vh_out_right[id] = mid_center_y
         if id in vh_out_right:
-            if cr.within_upper_line(center_x, upper_center_y):
-                cv2.circle(frame,(center_x,upper_center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,upper_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cr.within_upper_line(center_x, mid_center_y):
+                cv2.circle(frame,(center_x,mid_center_y),4,(255,0,0),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,mid_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_right:
                     counter_out_right.append(id)
                     #We know a new event occurred, so we now update the data writer with that information
