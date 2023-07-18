@@ -35,7 +35,7 @@ cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 # I am not entirely sure why it uses this wacky resolution
 # We should consider going back to a 16:9 aspect ratio because this appears to squish the footage,
 # which could negatively impact detection performance
-size = (1020, 500)
+size = (1920, 1080)
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 framerate = int(cap.get(cv2.CAP_PROP_FPS))
 
@@ -77,16 +77,17 @@ tracker=Tracker()
 ## For realistic_FOV_T_60_edited.mp4
 
 # (1020, 500)
-cl = Counter(uy1 = 317, uy2 = 327, ux1=135, ux2=487,
-            ly1 = 332, ly2 = 342, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
-cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
-            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
+#cl = Counter(uy1 = 317, uy2 = 327, ux1=135, ux2=487,
+#            ly1 = 332, ly2 = 342, lx1=14, lx2=462, offx=4, offuy=5, offly=5)
+#cr = Counter(uy1 = 333, uy2 = 323, ux1=561, ux2=926,
+#            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
 
 # (1920, 1080)
-#cl = Counter(uy1 = 630, uy2 = 830, ux1=250, ux2=600,
-#            ly1 = 670, ly2 = 870, lx1=240, lx2=580, offx=4, offuy=5, offly=5)
-#cr = Counter(uy1 = 830, uy2 = 630, ux1=1320, ux2=1870,
-#            ly1 = 870, ly2 = 670, lx1=1330, lx2=1880, offx=4, offuy=5, offly=5)
+cl = Counter(uy1 = 685, uy2 = 706, ux1=254, ux2=917,
+            ly1 = 717, ly2 = 738, lx1=26, lx2=869, offx=8, offuy=11, offly=11)
+cr = Counter(uy1 = 719, uy2 = 698, ux1=1056, ux2=1743,
+            ly1 = 741, ly2 = 719, lx1=1110, lx2=1916, offx=8, offuy=11, offly=11)
+
 ## END
 #-------------------------------------------------------------------------------------------------
 ## START
