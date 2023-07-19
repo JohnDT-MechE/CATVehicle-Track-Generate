@@ -88,13 +88,13 @@ tracker=Tracker()
 cl = Counter(uy1 = 685, uy2 = 706, ux1=254, ux2=917,
             ly1 = 717, ly2 = 738, lx1=26, lx2=869, offx=8, offuy=15, offly=15)
 cr = Counter(uy1 = 715, uy2 = 690, ux1=1056, ux2=1743,
-            ly1 = 730, ly2 = 705, lx1=1110, lx2=1916, offx=8, offuy=7, offly=7)
+            ly1 = 730, ly2 = 705, lx1=1110, lx2=1916, offx=8, offuy=7, offly=8)
 
+# OLD
 #cl = Counter(uy1 = 685, uy2 = 706, ux1=254, ux2=917,
             #ly1 = 717, ly2 = 738, lx1=26, lx2=869, offx=8, offuy=15, offly=15)
 #cr = Counter(uy1 = 719, uy2 = 698, ux1=1056, ux2=1743,
             #ly1 = 741, ly2 = 719, lx1=1110, lx2=1916, offx=8, offuy=10, offly=10)
-
 ## END
 #-------------------------------------------------------------------------------------------------
 ## START
