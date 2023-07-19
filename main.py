@@ -3,6 +3,9 @@
 # Altered by Adhith, John, and Max
 # Last updated 18 July 2023
 
+# THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
+configuration_name = 'ultrawide_front_1920_1080'
+
 import cv2
 import pandas as pd
 from ultralytics import YOLO
@@ -26,19 +29,22 @@ cv2.setMouseCallback('RGB', RGB)
 
 #Code to parse the configurations from the configurations.json file
 with open("configurations.json") as configuration:
-    config = json.load(configuration)['ultrawide_front_1920_1080']
+    # This reads in the specific configuration we are looking for. They are named by perspective and resolution
+    config = json.load(configuration)[configuration_name]
 
+    # The JSON configuration stores the size to clip the video footage to
     size = (config['width'], config['height'])
     
+    # The JSON configuration also stores the video source and video/data outputs
     video_source = config['video_source']
     video_output = config['video_output']
     data_output = config['data_output']
 
+    # JSON configurations have two objects, one for the left line locations and offsets, and one for the right line
     l_config = config['left_line']
     r_config = config['right_line']
 
-
-
+    # Each l_config or r_config has lists for each endpoint of the two lines, which give coordinates in [x, y] format
     cl = Counter(uy1 = l_config['upper_1'][1], uy2 = l_config['upper_2'][1], ux1=l_config['upper_1'][0], ux2=l_config['upper_2'][0],
                 ly1 = l_config['lower_1'][1], ly2 = l_config['lower_2'][1], lx1=l_config['lower_1'][0], lx2=l_config['lower_2'][0],
                 offx=l_config['offx'], offuy=l_config['offuy'], offly=l_config['offly'])
