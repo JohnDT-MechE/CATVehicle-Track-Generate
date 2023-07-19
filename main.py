@@ -1,10 +1,10 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 18 July 2023
+# Last updated 19 July 2023
 
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
-configuration_name = 'ultrawide_front_1920_1080'
+configuration_name = 'ultrawide_front_1020_500'
 
 import cv2
 import pandas as pd
