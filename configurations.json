@@ -1,5 +1,5 @@
 {
-    "ultrawide_front_1080": {
+    "ultrawide_front_1920_1080": {
         "video_source": "realistic_FOV_T_60_edited.mp4",
         "video_output": "front_perspective.avi",
         "data_output": "data_front_ultrawide.csv",
@@ -22,6 +22,81 @@
             "offx": 8,
             "offuy": 11,
             "offly": 11
+        }
+    },
+    "ultrawide_front_1020_500": {
+        "video_source": "realistic_FOV_T_60_edited.mp4",
+        "video_output": "front_perspective_trimmed.avi",
+        "data_output": "data_front_ultrawide_trimmed.csv",
+        "width": 1020,
+        "height": 500,
+        "left_line": {
+            "upper_1": [135, 317],
+            "upper_2": [487, 327],
+            "lower_1": [14, 332],
+            "lower_2": [462, 342],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "right_line": {
+            "upper_1": [561, 333],
+            "upper_2": [926, 323],
+            "lower_1": [590, 343],
+            "lower_2": [1018, 333],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        }
+    },
+    "ultrawide_rear_1920_1080": {
+        "video_source": "realistic_FOV_J_30_edited.mp4",
+        "video_output": "rear_perspective.avi",
+        "data_output": "data_rear_ultrawide.csv",
+        "width": 1920,
+        "height": 1080,
+        "left_line": {
+            "upper_1": [254, 685],
+            "upper_2": [917, 706],
+            "lower_1": [26, 717],
+            "lower_2": [869, 738],
+            "offx": 8,
+            "offuy": 11,
+            "offly": 11
+        },
+        "right_line": {
+            "upper_1": [1056, 719],
+            "upper_2": [1743, 698],
+            "lower_1": [1110, 741],
+            "lower_2": [1916, 719],
+            "offx": 8,
+            "offuy": 11,
+            "offly": 11
+        }
+    },
+    "long_range_stationary_b_1020_500": {
+        "video_source": "long_range_b.mp4",
+        "video_output": "long_range_b_output.avi",
+        "data_output": "data_long_range_b.csv",
+        "width": 1020,
+        "height": 500,
+        "left_line": {
+            "upper_1": [184, 323],
+            "upper_2": [410, 333],
+            "lower_1": [10, 333],
+            "lower_2": [370, 343],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "right_line": {
+            "upper_1": [435, 333],
+            "upper_2": [814, 323],
+            "lower_1": [443, 343],
+            "lower_2": [1007, 333],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
         }
     }
 }
