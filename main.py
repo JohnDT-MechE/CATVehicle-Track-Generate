@@ -48,8 +48,8 @@ with open("configurations.json") as configuration:
     
 
 cap=cv2.VideoCapture(video_source)
+cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 
-#gets frame count and framerate for progress bar and to ensure output is 10fps real time
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 framerate = int(cap.get(cv2.CAP_PROP_FPS))
 
@@ -65,7 +65,6 @@ class_list = data.split("\n")
 count=0
 #create a new tracker opbject - this keeps track of which objects are actively crossing the lines
 tracker=Tracker()
-
 
 #This section holds IDs of cars going into and out of frame on left and right for tracking
 vh_in_left = {}
@@ -97,8 +96,8 @@ for _ in tqdm.tqdm(range(vid_length)):
     #this limits the effective framerate of what we are looking at to 10
     if count % (framerate/10) != 0:
         continue
-    
     #resize the frame according to the size specifid in the JSON configuration
+
     frame=cv2.resize(frame,size)
    
     #run YOLOv8 on the frame
