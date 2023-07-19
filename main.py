@@ -3,9 +3,6 @@
 # Altered by Adhith, John, and Max
 # Last updated 18 July 2023
 
-# THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
-configuration_name = 'ultrawide_front_1920_1080'
-
 import cv2
 import pandas as pd
 from ultralytics import YOLO
@@ -17,7 +14,9 @@ import json
 from tracker import*
 from counter import Counter, DataWriter
 
-model=YOLO('yolov8s.pt') # Change model if needed
+# THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
+configuration_name = 'ultrawide_rear_1020_500'
+model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE :  
@@ -54,7 +53,6 @@ with open("configurations.json") as configuration:
     
 
 cap=cv2.VideoCapture(video_source)
-cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 framerate = int(cap.get(cv2.CAP_PROP_FPS))
