@@ -5,7 +5,6 @@
 
 import cv2
 import pandas as pd
-import numpy as np
 from ultralytics import YOLO
 import time
 import tqdm
@@ -27,8 +26,27 @@ cv2.setMouseCallback('RGB', RGB)
 
 #Code to parse the configurations from the configurations.json file
 with open("configurations.json") as configuration:
-    config = json.load(configuration)
-    print(config)
+    config = json.load(configuration)['ultrawide_front_1080']
+
+    size = (config['width'], config['height'])
+    
+    video_source = config['video_source']
+    video_output = config['video_output']
+    data_output = config['data_output']
+
+    l_config = config['left_line']
+    r_config = config['right_line']
+
+
+
+    cl = Counter(uy1 = l_config['upper_1'][1], uy2 = l_config['upper_2'][1], ux1=l_config['upper_1'][0], ux2=l_config['upper_2'][0],
+                ly1 = l_config['lower_1'][1], ly2 = l_config['lower_2'][1], lx1=l_config['lower_1'][0], lx2=l_config['lower_2'][0],
+                offx=l_config['offx'], offuy=l_config['offuy'], offly=l_config['offly'])
+    cr = Counter(uy1 = r_config['upper_1'][1], uy2 = r_config['upper_2'][1], ux1=r_config['upper_1'][0], ux2=r_config['upper_2'][0],
+                ly1 = r_config['lower_1'][1], ly2 = r_config['lower_2'][1], lx1=r_config['lower_1'][0], lx2=r_config['lower_2'][0],
+                offx=r_config['offx'], offuy=r_config['offuy'], offly=r_config['offly'])
+    
+    
 
 
 # Describe name of video being used
@@ -36,14 +54,13 @@ with open("configurations.json") as configuration:
 # REAR FOV
 #cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
 # FRONT FOV
-cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
+cap=cv2.VideoCapture(video_source)
 
 # resolution of the video capture this is also used to trim each frame later on
 # I am not entirely sure why it uses this wacky resolution
 # We should consider going back to a 16:9 aspect ratio because this appears to squish the footage,
 # which could negatively impact detection performance
 # size = (1020, 500)
-size = (1920, 1080)
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 framerate = int(cap.get(cv2.CAP_PROP_FPS))
 
@@ -51,9 +68,7 @@ framerate = int(cap.get(cv2.CAP_PROP_FPS))
 # The output is stored in 'filename.avi' file.
 # you have to add this to your .gitignore file (add the line below)
 # output.*
-out = cv2.VideoWriter('filename.avi', 
-                         cv2.VideoWriter_fourcc(*'MJPG'),
-                         10, size)
+out = cv2.VideoWriter(video_output, cv2.VideoWriter_fourcc(*'MJPG'), 10, size)
 
 #read the classes yolov8 identifies
 my_file = open("coco.txt", "r")
@@ -92,10 +107,10 @@ tracker=Tracker()
 #            ly1 = 343, ly2 = 333, lx1=590, lx2=1018, offx=4, offuy=5, offly=5)
 
 # (1920, 1080)
-cl = Counter(uy1 = 685, uy2 = 706, ux1=254, ux2=917,
-            ly1 = 717, ly2 = 738, lx1=26, lx2=869, offx=8, offuy=11, offly=11)
-cr = Counter(uy1 = 719, uy2 = 698, ux1=1056, ux2=1743,
-            ly1 = 741, ly2 = 719, lx1=1110, lx2=1916, offx=8, offuy=11, offly=11)
+# cl = Counter(uy1 = 685, uy2 = 706, ux1=254, ux2=917,
+#            ly1 = 717, ly2 = 738, lx1=26, lx2=869, offx=8, offuy=11, offly=11)
+# cr = Counter(uy1 = 719, uy2 = 698, ux1=1056, ux2=1743,
+#            ly1 = 741, ly2 = 719, lx1=1110, lx2=1916, offx=8, offuy=11, offly=11)
 
 ## END
 #-------------------------------------------------------------------------------------------------
@@ -123,7 +138,7 @@ counter_in_right = [] # List of IDs of cars that have gone into frame on Right
 counter_out_right = [] # List of IDs of cars that have gone out of frame on Right
 
 #create a new instance of the datawriter class to record the data we gather
-data_writer = DataWriter("data_ultrawide_rear.csv")
+data_writer = DataWriter(data_output)
 
 #start time in GMT unix time
 start_time = time.time()
@@ -187,11 +202,9 @@ for _ in tqdm.tqdm(range(vid_length)):
         x3,y3,x4,y4,id=bbox
         # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
-        # Uncomment line below for center point of bounding box
+        # gets the various y-axis midpoints used in detection
         mid_center_y=int(y3+y4)//2
-        # Uncomment line below for center point of bottom y-axis of bounding box
         lower_center_y=y4
-        # Uncomment line below for center point of upper y-axis of bounding box
         upper_center_y=y3
         
         # LEFT SIDE
