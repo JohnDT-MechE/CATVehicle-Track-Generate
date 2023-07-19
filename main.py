@@ -46,14 +46,7 @@ with open("configurations.json") as configuration:
                 ly1 = r_config['lower_1'][1], ly2 = r_config['lower_2'][1], lx1=r_config['lower_1'][0], lx2=r_config['lower_2'][0],
                 offx=r_config['offx'], offuy=r_config['offuy'], offly=r_config['offly'])
     
-    
 
-
-# Describe name of video being used
-#cap=cv2.VideoCapture('long_range_b.mp4')
-# REAR FOV
-#cap=cv2.VideoCapture('realistic_FOV_T_60_edited.mp4')
-# FRONT FOV
 cap=cv2.VideoCapture(video_source)
 
 #gets frame count and framerate for progress bar and to ensure output is 10fps real time

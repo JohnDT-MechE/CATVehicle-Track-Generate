@@ -11,17 +11,17 @@
             "lower_1": [26, 717],
             "lower_2": [869, 738],
             "offx": 8,
-            "offuy": 11,
-            "offly": 11
+            "offuy": 15,
+            "offly": 15
         },
         "right_line": {
-            "upper_1": [1056, 719],
-            "upper_2": [1743, 698],
+            "upper_1": [1056, 715],
+            "upper_2": [1743, 689],
             "lower_1": [1110, 741],
-            "lower_2": [1916, 719],
+            "lower_2": [1916, 704],
             "offx": 8,
-            "offuy": 11,
-            "offly": 11
+            "offuy": 7,
+            "offly": 8
         }
     },
     "ultrawide_front_1020_500": {
