@@ -147,7 +147,7 @@ for _ in tqdm.tqdm(range(vid_length)):
         mid_center_y=int(y3+y4)//2
         lower_center_y=y4
         upper_center_y=y3
-        lower_quarter_center_y=int(y3+y4)//4
+        lower_quarter_center_y=int((y3*0.25)+(y4*0.75))
         
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
