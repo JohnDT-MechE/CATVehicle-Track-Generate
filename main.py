@@ -34,7 +34,10 @@ with open("configurations.json") as configuration:
     # The JSON configuration stores the size to clip the video footage to
     size = (config['width'], config['height'])
 
-    start_time = config["timestamp"]
+    try:
+        start_time = config["timestamp"]
+    except:
+        start_time = 1689368367
     
     # The JSON configuration also stores the video source and video/data outputs
     video_source = config['video_source']
