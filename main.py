@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 19 July 2023
+# Last updated 20 July 2023
 
 import cv2
 import pandas as pd
@@ -143,10 +143,11 @@ for _ in tqdm.tqdm(range(vid_length)):
         x3,y3,x4,y4,id=bbox
         # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
-        # gets the various y-axis midpoints used in detection
+        # gets the various y-axis midpoints of bounding boxes used in detection
         mid_center_y=int(y3+y4)//2
         lower_center_y=y4
         upper_center_y=y3
+        lower_quarter_center_y=int((y3*0.25)+(y4*0.75))
         
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
