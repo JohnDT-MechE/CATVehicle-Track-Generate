@@ -1,6 +1,6 @@
 {
     "ultrawide_front_1920_1080": {
-        "video_source": "realistic_FOV_T_60_edited.mp4",
+        "video_source": "ultrawide_front_edited.mp4",
         "video_output": "front_ultrawide_out.avi",
         "data_output": "data_front_ultrawide.csv",
         "width": 1920,
@@ -77,7 +77,7 @@
         "timestamp": 1689368367
     },
     "ultrawide_rear_1920_1080": {
-        "video_source": "realistic_FOV_J_30_edited.mp4",
+        "video_source": "ultrawide_rear_edited.mp4",
         "video_output": "rear_ultrawide_out.avi",
         "data_output": "data_rear_ultrawide.csv",
         "width": 1920,
