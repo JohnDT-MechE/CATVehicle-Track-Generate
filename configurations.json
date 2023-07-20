@@ -25,7 +25,7 @@
         }
     },
     "ultrawide_front_1020_500": {
-        "video_source": "ultrawide_front.mov",
+        "video_source": "ultrawide_front_edited.mp4",
         "video_output": "ultrawide_front_output.avi",
         "data_output": "data_front_ultrawide.csv",
         "width": 1020,
