@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 19 July 2023
+# Last updated 20 July 2023
 
 import cv2
 import pandas as pd
@@ -147,6 +147,7 @@ for _ in tqdm.tqdm(range(vid_length)):
         mid_center_y=int(y3+y4)//2
         lower_center_y=y4
         upper_center_y=y3
+        lower_quarter_center_y=int(y3+y4)//4
         
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
