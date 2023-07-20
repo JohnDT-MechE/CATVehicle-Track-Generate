@@ -89,7 +89,7 @@ counter_out_right = []
 data_writer = DataWriter(data_output)
 
 #start time in GMT unix time
-start_time = time.time()
+start_time = 1689789501
 
 #loop through the video
 for _ in tqdm.tqdm(range(vid_length)):    
