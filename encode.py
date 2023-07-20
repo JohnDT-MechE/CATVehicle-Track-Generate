@@ -40,19 +40,42 @@ def encode(filename, flipped=False):
 
     return code
 
-def filter_timestamps(file1, file2):
+def filter_timestamps(file1, file2, cutoff):
     df1 = pd.read_csv(file1)
     df2 = pd.read_csv(file2)
 
-    length = min(df1.shape[0], df2.shape[0])
+    matched_events = []
 
-    location = 0
 
-    while location <= length - 1:
-        
+    reverse_map = {'in left': 'out right', 'in right': 'out left', 'out left': 'in right', 'out right': 'in left'}
+    total_diff = 0
+    events = 0
+
+    #iterate over all the times in file 1
+    for _, entry1 in df1.iterrows():
+        t1 = entry1.iloc[0]
+        e1 = entry1.iloc[1]
+        for _, entry2 in df2.iterrows():
+            t2 = entry2.iloc[0]
+            e2 = entry2.iloc[1]
+            #check if the times are within the cutoff
+            if (t1 + cutoff > t2) and (t1 - cutoff < t2):
+                if t2 not in matched_events:
+                    matched_events.append(t2)
+                    status = 'good' if reverse_map[e2] == e1 else 'bad'
+                    total_diff += abs(t1 - t2)
+                    events += 1
+                    print('Match: ' + e1 + ' ' + e2 +'\t\t' + str(t1) + ' ' + str(t2) + '\tDiff: ' + str(int((t1 - t2)*100)/100) +  '\t' + status)
+    print("Number of good events: " + str(events))
+    print("Average Difference Between 'good' events: " + str(total_diff/events))
+
+            
 
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
 if __name__ == "__main__":
-    file = "data_rear_ultrawide.csv"
-    print(encode(file, flipped=False))
+    file1 = "data_rear_ultrawide.csv"
+    file2 = "data_front_ultrawide.csv"
+    #print(encode(file, flipped=False))
+
+    filter_timestamps(file1, file2, 3)
