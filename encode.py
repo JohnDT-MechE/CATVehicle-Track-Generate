@@ -40,8 +40,19 @@ def encode(filename, flipped=False):
 
     return code
 
+def filter_timestamps(file1, file2):
+    df1 = pd.read_csv(file1)
+    df2 = pd.read_csv(file2)
+
+    length = min(df1.shape[0], df2.shape[0])
+
+    location = 0
+
+    while location <= length - 1:
+        
+
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
 if __name__ == "__main__":
-    file = "data.csv"
+    file = "data_rear_ultrawide.csv"
     print(encode(file, flipped=False))
