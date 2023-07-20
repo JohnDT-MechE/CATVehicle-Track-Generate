@@ -25,9 +25,9 @@
         }
     },
     "ultrawide_front_1020_500": {
-        "video_source": "realistic_FOV_T_60_edited.mp4",
-        "video_output": "front_perspective_trimmed.avi",
-        "data_output": "data_front_ultrawide_trimmed.csv",
+        "video_source": "ultrawide_front.mov",
+        "video_output": "ultrawide_front_output.avi",
+        "data_output": "data_front_ultrawide.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -47,12 +47,13 @@
             "offx": 4,
             "offuy": 5,
             "offly": 5
-        }
+        },
+        "timestamp": 1689368352
     },
     "ultrawide_rear_1020_500": {
-        "video_source": "realistic_FOV_J_30_edited.mp4",
-        "video_output": "rear_perspective_trimmed.avi",
-        "data_output": "data_rear_ultrawide_trimmed.csv",
+        "video_source": "ultrawide_rear.mov",
+        "video_output": "ultrawide_rear_output.avi",
+        "data_output": "data_rear_ultrawide.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -72,7 +73,8 @@
             "offx": 4,
             "offuy": 5,
             "offly": 5
-        }
+        },
+        "timestamp": 1689368367
     },
     "ultrawide_rear_1920_1080": {
         "video_source": "realistic_FOV_J_30_edited.mp4",
