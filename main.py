@@ -143,7 +143,7 @@ for _ in tqdm.tqdm(range(vid_length)):
         x3,y3,x4,y4,id=bbox
         # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
-        # gets the various y-axis midpoints used in detection
+        # gets the various y-axis midpoints of bounding boxes used in detection
         mid_center_y=int(y3+y4)//2
         lower_center_y=y4
         upper_center_y=y3
