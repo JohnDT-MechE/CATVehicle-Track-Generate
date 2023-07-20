@@ -40,16 +40,26 @@ def encode(filename, flipped=False):
 
     return code
 
+
 def filter_timestamps(file1, file2, cutoff):
     df1 = pd.read_csv(file1)
     df2 = pd.read_csv(file2)
 
     matched_events = []
 
+    gray_code = {}
+    for i in range(0, 1<<5):
+        gray=i^(i>>1)
+        gray_code[i] = "{0:0{1}b}".format(gray,5)
 
-    reverse_map = {'in left': 'out right', 'in right': 'out left', 'out left': 'in right', 'out right': 'in left'}
+    normal_map = {'in left': '00', 'in right': '01', 'out left':'10', 'out right':'11'}
+    reverse_map = {'out right': '00', 'out left': '01', 'in right':'10', 'in left':'11'}
+
     total_diff = 0
     events = 0
+
+    data_string1 = ''
+    data_string2 = ''
 
     #iterate over all the times in file 1
     for _, entry1 in df1.iterrows():
@@ -62,12 +72,23 @@ def filter_timestamps(file1, file2, cutoff):
             if (t1 + cutoff > t2) and (t1 - cutoff < t2):
                 if t2 not in matched_events:
                     matched_events.append(t2)
-                    status = 'good' if reverse_map[e2] == e1 else 'bad'
+                    status = 'good' if reverse_map[e2] == normal_map[e1] else 'bad'
                     total_diff += abs(t1 - t2)
                     events += 1
                     print('Match: ' + e1 + ' ' + e2 +'\t\t' + str(t1) + ' ' + str(t2) + '\tDiff: ' + str(int((t1 - t2)*100)/100) +  '\t' + status)
+
+
+                    data_string1 += gray_code[((int)(t1/2) % 32)] + normal_map[e1]
+                    data_string2 += gray_code[((int)(t2/2) % 32)] + reverse_map[e2]
+
     print("Number of good events: " + str(events))
     print("Average Difference Between 'good' events: " + str(total_diff/events))
+
+    print('\n Data strings:')
+    print(data_string1)
+    print(data_string2)
+    
+    print((len(data_string1) - sum([1 if data_string1[index] != data_string2[index] else 0 for index in range(len(data_string1))])) / len(data_string1))
 
             
 
