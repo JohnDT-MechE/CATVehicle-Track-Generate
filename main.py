@@ -15,7 +15,7 @@ from tracker import*
 from counter import Counter, DataWriter
 
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
-configuration_name = 'ultrawide_rear_1020_500'
+configuration_name = 'ultrawide_front_1020_500'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
@@ -167,12 +167,12 @@ for _ in tqdm.tqdm(range(vid_length)):
 
                     
         # Counting vehicles going "outLeft" of frame
-        if cl.within_lower_line(center_x, mid_center_y):
-            vh_out_left[id] = mid_center_y
+        if cl.within_lower_line(center_x, lower_quarter_center_y):
+            vh_out_left[id] = lower_quarter_center_y
         if id in vh_out_left:
-            if cl.within_upper_line(center_x, mid_center_y):
-                cv2.circle(frame,(center_x,mid_center_y),4,(0,0,255),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,mid_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cl.within_upper_line(center_x, lower_quarter_center_y):
+                cv2.circle(frame,(center_x,lower_quarter_center_y),4,(0,0,255),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,lower_quarter_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_left:
                     counter_out_left.append(id)
                     data_writer.add_event('out left', start_time + count/framerate)
@@ -195,16 +195,16 @@ for _ in tqdm.tqdm(range(vid_length)):
                     data_writer.add_event('in right', start_time + count/framerate)
                     
         # Counting vehicles going "outRight" of frame
-        if cr.within_lower_line(center_x, mid_center_y):
-            vh_out_right[id] = mid_center_y
+        if cr.within_lower_line(center_x, lower_quarter_center_y):
+            vh_out_right[id] = lower_quarter_center_y
         if id in vh_out_right:
-            if cr.within_upper_line(center_x, mid_center_y):
-                cv2.circle(frame,(center_x,mid_center_y),4,(255,0,0),-1) # Draw circle
-                cv2.putText(frame,str(id),(center_x,mid_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
+            if cr.within_upper_line(center_x, lower_quarter_center_y):
+                cv2.circle(frame,(center_x,lower_quarter_center_y),4,(255,0,0),-1) # Draw circle
+                cv2.putText(frame,str(id),(center_x,lower_quarter_center_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(0,255,255),2) # Give and Print ID
                 if id not in counter_out_right:
                     counter_out_right.append(id)
                     data_writer.add_event('out right', start_time + count/framerate)
-        
+                    
     #this part annotates the lines on the frame
     cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255))
     cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(255,0,0))
