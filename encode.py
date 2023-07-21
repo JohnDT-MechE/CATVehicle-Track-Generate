@@ -69,7 +69,7 @@ def filter_timestamps(file1, file2, cutoff):
             t2 = entry2.iloc[0]
             e2 = entry2.iloc[1]
             #check if the times are within the cutoff
-            if (t1 + cutoff > t2) and (t1 - cutoff < t2):
+            if abs(t1-t2) < cutoff:
                 #check we haven't already matched something to this event
                 if t2 not in matched_events:
                     matched_events.append(t2)
