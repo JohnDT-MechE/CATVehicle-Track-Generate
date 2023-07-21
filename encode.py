@@ -10,8 +10,8 @@ def encode_event(t, e, reverse=False):
         gray=i^(i>>1)
         gray_code[i] = "{0:0{1}b}".format(gray,5)
 
-    normal_map = {'in left': '00', 'in right': '01', 'out left':'10', 'out right':'11'}
-    reverse_map = {'out right': '00', 'out left': '01', 'in right':'10', 'in left':'11'}
+    normal_map = {'in left': '0001', 'in right': '0010', 'out left':'1000', 'out right':'0100'}
+    reverse_map = {'out right': '0001', 'out left': '0010', 'in right':'1000', 'in left':'0100'}
 
     return gray_code[((int)(t/2) % 32)] + (normal_map[e] if not reverse else reverse_map[e])
 
@@ -51,8 +51,8 @@ def filter_timestamps(file1, file2, cutoff, file):
         gray=i^(i>>1)
         gray_code[i] = "{0:0{1}b}".format(gray,5)
 
-    normal_map = {'in left': '00', 'in right': '01', 'out left':'10', 'out right':'11'}
-    reverse_map = {'out right': '00', 'out left': '01', 'in right':'10', 'in left':'11'}
+    normal_map = {'in left': '0001', 'in right': '0100', 'out left':'0010', 'out right':'1000'}
+    reverse_map = {'out right': '0001', 'out left': '0100', 'in right':'0010', 'in left':'1000'}
 
     total_diff = 0
     events = 0
@@ -96,21 +96,21 @@ def filter_timestamps(file1, file2, cutoff, file):
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
 if __name__ == "__main__":
-    file1 = "data-files/data_adversary_rear_left.csv"
-    file2 = "data-files/data_front_ultrawide_long.csv"
+    file1 = "data-files/data_front_ultrawide.csv"
+    file2 = "data-files/data_rear_ultrawide.csv"
     #print(encode(file, flipped=False))
 
     #filter_timestamps(file1, file2, 3)
 
     #time for rear left: 1689369626, 120 seconds long
     #time for normal ultrawide: 1689368390, 238 seconds long
-    data1 = block_encoding(file1, 1689369626, block_size=10, num_blocks=12, time_gap = 0)
-    data2 = block_encoding(file2, 1689369626, block_size=10, num_blocks=12, time_gap = 0, reverse = True)
+    data1 = block_encoding(file1, 1689368390, block_size=10, num_blocks=23, time_gap = 0)
+    data2 = block_encoding(file2, 1689368390, block_size=10, num_blocks=23, time_gap = 0, reverse = True)
 
     total_accuracy = 0
     num_blocks_counted = 0
 
-    with open('encoding-results/adversary_both_methods.txt', 'w') as f:
+    with open('encoding-results/normal_one_hot.txt', 'w') as f:
         filter_timestamps(file1, file2, 3, file=f)
         for i in range(len(data1)):
             block1 = data1[i]
