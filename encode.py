@@ -96,28 +96,45 @@ def filter_timestamps(file1, file2, cutoff):
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
 if __name__ == "__main__":
-    file1 = "data_rear_ultrawide.csv"
-    file2 = "data_front_ultrawide.csv"
+    file1 = "data-files/data_adversary_rear_left.csv"
+    file2 = "data-files/data_front_ultrawide_long.csv"
     #print(encode(file, flipped=False))
 
     filter_timestamps(file1, file2, 3)
 
-    data1 = block_encoding(file1, 1689368390, block_size=10, num_blocks=20, time_gap = 0)
-    data2 = block_encoding(file2, 1689368390, block_size=10, num_blocks=20, time_gap = 0, reverse = True)
+    #time for rear left: 1689369626, 120 seconds long
+    #time for normal ultrawide: 1689368390, 238 seconds long
+    data1 = block_encoding(file1, 1689369626, block_size=10, num_blocks=12, time_gap = 0)
+    data2 = block_encoding(file2, 1689369626, block_size=10, num_blocks=12, time_gap = 0, reverse = True)
 
     total_accuracy = 0
     num_blocks_counted = 0
 
-    for i in range(len(data1)):
-        block1 = data1[i]
-        block2 = data2[i]
-        length = min(len(block1), len(block2))
-        if length != 0:
-            accuracy_percent = (length - sum([1 if block1[index] != block2[index] else 0 for index in range(length)])) / length
-            total_accuracy += accuracy_percent
-            num_blocks_counted += 1
-        else:
-            accuracy_percent = 'N/A'
+    with open('encoding-results/result_adversary_rear_left_v2.txt', 'w') as f:
+        for i in range(len(data1)):
+            block1 = data1[i]
+            block2 = data2[i]
+            length = min(len(block1), len(block2))
+            max_len = max(len(block1), len(block2))
+            if len(block1) < len(block2):
+                short = block1
+                long = block2
+            else:
+                short = block2
+                long = block1
+            if max_len != 0:
+                short = short + '0'*(max_len-length)
+                accuracy_percent = (max_len - sum([1 if short[index] != long[index] else 0 for index in range(max_len)])) / max_len
+                total_accuracy += accuracy_percent
+                num_blocks_counted += 1
+            else:
+                accuracy_percent = 'N/A'
 
-        print('Block #: ' + str(i) + '\n\t Block one: ' + block1 + '\n\t Block two: ' + block2 + '\n\t Accuracy: ' + str(accuracy_percent))
-    print('\n\nAverage Accuracy: ' + str(total_accuracy/num_blocks_counted))
+            output = 'Block #: ' + str(i) + '\n\t Block one: ' + block1 + '\n\t Block two: ' + block2 + '\n\t Accuracy: ' + str(accuracy_percent) + '\n'
+
+            f.write(output)
+            print(output)
+
+        avg_acc = '\n\nAverage Accuracy: ' + str(total_accuracy/num_blocks_counted)
+        f.write(avg_acc)
+        print(avg_acc)

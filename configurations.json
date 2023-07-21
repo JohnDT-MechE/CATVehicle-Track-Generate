@@ -2,7 +2,7 @@
     "ultrawide_front_long_1020_500": {
         "video_source": "ultrawide_front_long_edited.mp4",
         "video_output": "front_ultrawide_long_out.avi",
-        "data_output": "data_front_ultrawide_long.csv",
+        "data_output": "data-files/data_front_ultrawide_long.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -28,7 +28,7 @@
     "adversary_rear_right_1020_500": {
         "video_source": "adversary_rear_right_edited.mp4",
         "video_output": "rear_adversary_out.avi",
-        "data_output": "data_adversary_rear_right.csv",
+        "data_output": "data-files/data_adversary_rear_right.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -54,7 +54,7 @@
     "adversary_rear_left_1020_500": {
         "video_source": "adversary_rear_left_edited.mp4",
         "video_output": "left_adversary_out.avi",
-        "data_output": "data_adversary_rear_left.csv",
+        "data_output": "data-files/data_adversary_rear_left.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -80,7 +80,7 @@
     "ultrawide_front_1920_1080": {
         "video_source": "ultrawide_front_edited.mp4",
         "video_output": "front_ultrawide_out.avi",
-        "data_output": "data_front_ultrawide.csv",
+        "data_output": "data-files/data_front_ultrawide.csv",
         "width": 1920,
         "height": 1080,
         "left_line": {
@@ -105,7 +105,7 @@
     "ultrawide_front_1020_500": {
         "video_source": "ultrawide_front_edited.mp4",
         "video_output": "ultrawide_front_output.avi",
-        "data_output": "data_front_ultrawide.csv",
+        "data_output": "data-files/data_front_ultrawide.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -131,7 +131,7 @@
     "ultrawide_rear_1020_500": {
         "video_source": "ultrawide_rear_edited.mp4",
         "video_output": "ultrawide_rear_output.avi",
-        "data_output": "data_rear_ultrawide.csv",
+        "data_output": "data-files/data_rear_ultrawide.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -157,7 +157,7 @@
     "ultrawide_rear_1920_1080": {
         "video_source": "ultrawide_rear_edited.mp4",
         "video_output": "rear_ultrawide_out.avi",
-        "data_output": "data_rear_ultrawide.csv",
+        "data_output": "data-files/data_rear_ultrawide.csv",
         "width": 1920,
         "height": 1080,
         "left_line": {
@@ -182,7 +182,7 @@
     "long_range_stationary_b_1020_500": {
         "video_source": "long_range_b.mp4",
         "video_output": "long_range_b_output.avi",
-        "data_output": "data_long_range_b.csv",
+        "data_output": "data-files/data_long_range_b.csv",
         "width": 1020,
         "height": 500,
         "left_line": {

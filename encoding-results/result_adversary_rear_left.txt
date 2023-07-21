@@ -1,0 +1,51 @@
+Block #: 0
+	 Block one: 0101101
+	 Block two: 0100101
+	 Accuracy: 0.8571428571428571
+Block #: 1
+	 Block one: 
+	 Block two: 
+	 Accuracy: N/A
+Block #: 2
+	 Block one: 10100011011111
+	 Block two: 10100111011001
+	 Accuracy: 0.7857142857142857
+Block #: 3
+	 Block one: 10011011000111100010110000011000011
+	 Block two: 1001000
+	 Accuracy: 0.14285714285714285
+Block #: 4
+	 Block one: 0000101
+	 Block two: 000110100010010011011
+	 Accuracy: 0.2857142857142857
+Block #: 5
+	 Block one: 
+	 Block two: 0010110
+	 Accuracy: 0.0
+Block #: 6
+	 Block one: 010100101011010100111
+	 Block two: 0100001
+	 Accuracy: 0.2857142857142857
+Block #: 7
+	 Block one: 1100101110010111011111101111
+	 Block two: 11001111111001
+	 Accuracy: 0.35714285714285715
+Block #: 8
+	 Block one: 1010101
+	 Block two: 
+	 Accuracy: 0.0
+Block #: 9
+	 Block one: 10111011000101
+	 Block two: 
+	 Accuracy: 0.0
+Block #: 10
+	 Block one: 1000011
+	 Block two: 1000001
+	 Accuracy: 0.8571428571428571
+Block #: 11
+	 Block one: 0010001
+	 Block two: 
+	 Accuracy: 0.0
+
+
+Average Accuracy: 0.3246753246753247
