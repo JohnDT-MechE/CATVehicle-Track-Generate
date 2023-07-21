@@ -1,45 +1,6 @@
 import pandas as pd
 import numpy as np
 
-
-def encode(filename, flipped=False):
-    """
-    This function takes in the filename of a CSV (needs to have headers) with columns for time and event type
-
-    Reads into a dataframe
-    Iterates through the rows, and then
-    creates data from this by taking the times and classes
-    then converts to a binary string
-    """
-    df = pd.read_csv(filename)
-
-    shape = df.shape
-
-    #get a dictionary mapping each event to a unique id
-    unique_dict = {}
-    for index, event_type in enumerate({c: df[c].unique() for c in df}['event']):
-        unique_dict[event_type] = index
-
-    gray_code = {}
-    for i in range(0, 1<<5):
-        gray=i^(i>>1)
-        gray_code[i] = "{0:0{1}b}".format(gray,5)
-
-    normal_map = {0: '00', 1: '01', 2:'10', 3:'11'}
-    reverse_map = {0: '10', 1: '11', 2:'00', 3:'01'}
-
-
-    code = ''
-    #loop through the rows in the data
-    for row_index in range(shape[0]):
-        time = df.iloc[row_index, 0]
-        event_type = unique_dict[df.iloc[row_index, 1]]
-
-        code += gray_code[((int)(time/2) % 32)]
-        code += normal_map[event_type] if not flipped else reverse_map[event_type]
-
-    return code
-
 def encode_event(t, e, reverse=False):
     """
     Encodes a single event event, adding it to data
@@ -52,30 +13,26 @@ def encode_event(t, e, reverse=False):
     normal_map = {'in left': '00', 'in right': '01', 'out left':'10', 'out right':'11'}
     reverse_map = {'out right': '00', 'out left': '01', 'in right':'10', 'in left':'11'}
 
-    return gray_code[((int)(t/2) % 32)] + normal_map[e] if not reverse else reverse_map[e]
+    return gray_code[((int)(t/2) % 32)] + (normal_map[e] if not reverse else reverse_map[e])
 
-def block_encoding(filename, start_time, block_size, num_blocks, reverse=False):
+def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False):
     """
     Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
     """
     df = pd.read_csv(filename)
 
-    end_time = df.iloc[-1, 0]
-
-    blocks = ['' for i in range(num_blocks)]
+    blocks = ['' for _ in range(num_blocks)]
     
     for _, entry in df.iterrows():
         t = entry.iloc[0]
         e = entry.iloc[1]
 
-        block = int(t - start_time)//block_size
+        block = int(t - start_time)//(block_size+time_gap)
 
-        if block >= 0 and block < num_blocks:
+        if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
             blocks[block] += (encode_event(t, e, reverse))
 
     return blocks
-
-
 
 def filter_timestamps(file1, file2, cutoff):
     """
@@ -128,7 +85,7 @@ def filter_timestamps(file1, file2, cutoff):
     print("Percentage of good events:\t file1: " + str(events/df1.shape[0]) + '; file2: ' + str(events/df2.shape[0]))
     print("Mean Difference Between 'good' events: " + str(total_diff/events))
 
-    print('\n Data strings:')
+    print('\n Filtered Data strings:')
     print(data_string1)
     print(data_string2)
     
@@ -145,5 +102,22 @@ if __name__ == "__main__":
 
     filter_timestamps(file1, file2, 3)
 
-    print(block_encoding(file1, 1689368390, 10, 10))
-    print(block_encoding(file2, 1689368390, 10, 10))
+    data1 = block_encoding(file1, 1689368390, block_size=10, num_blocks=10, time_gap = 0)
+    data2 = block_encoding(file2, 1689368390, block_size=10, num_blocks=10, time_gap = 0, reverse = True)
+
+    total_accuracy = 0
+    num_blocks_counted = 0
+
+    for i in range(len(data1)):
+        block1 = data1[i]
+        block2 = data2[i]
+        length = min(len(block1), len(block2))
+        if length != 0:
+            accuracy_percent = (length - sum([1 if block1[index] != block2[index] else 0 for index in range(length)])) / length
+            total_accuracy += accuracy_percent
+            num_blocks_counted += 1
+        else:
+            accuracy_percent = 'N/A'
+
+        print('Block #: ' + str(i) + '\n\t Block one: ' + block1 + '\n\t Block two: ' + block2 + '\n\t Accuracy: ' + str(accuracy_percent))
+    print('\n\nAverage Accuracy: ' + str(total_accuracy/num_blocks_counted))
