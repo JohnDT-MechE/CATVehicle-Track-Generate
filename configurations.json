@@ -3,6 +3,8 @@
         "video_source": "ultrawide_front_long.mp4",
         "video_output": "front_ultrawide_long_out.avi",
         "data_output": "data_front_ultrawide_long.csv",
+        "width": 1020,
+        "height": 500,
         "left_line": {
             "upper_1": [135, 317],
             "upper_2": [487, 327],
@@ -27,6 +29,8 @@
         "video_source": "adversary_rear_right.mp4",
         "video_output": "rear_adversary_out.avi",
         "data_output": "data_adversary_rear_right.csv",
+        "width": 1020,
+        "height": 500,
         "left_line": {
             "upper_1": [135, 317],
             "upper_2": [487, 327],
@@ -51,6 +55,8 @@
         "video_source": "adversary_rear_left.mp4",
         "video_output": "left_adversary_out.avi",
         "data_output": "data_adversary_left_right.csv",
+        "width": 1020,
+        "height": 500,
         "left_line": {
             "upper_1": [135, 317],
             "upper_2": [487, 327],
