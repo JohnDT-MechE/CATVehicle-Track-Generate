@@ -48,7 +48,7 @@ def filter_timestamps(file1, file2, cutoff):
     matched_events = []
 
     gray_code = {}
-    for i in range(0, 1<<5):
+    for i in range(0, 1<<10):
         gray=i^(i>>1)
         gray_code[i] = "{0:0{1}b}".format(gray,5)
 
@@ -70,6 +70,7 @@ def filter_timestamps(file1, file2, cutoff):
             e2 = entry2.iloc[1]
             #check if the times are within the cutoff
             if (t1 + cutoff > t2) and (t1 - cutoff < t2):
+                #check we haven't already matched something to this event
                 if t2 not in matched_events:
                     matched_events.append(t2)
                     status = 'good' if reverse_map[e2] == normal_map[e1] else 'bad'
@@ -82,7 +83,8 @@ def filter_timestamps(file1, file2, cutoff):
                     data_string2 += gray_code[((int)(t2/2) % 32)] + reverse_map[e2]
 
     print("Number of good events: " + str(events))
-    print("Average Difference Between 'good' events: " + str(total_diff/events))
+    print("Percentage of good events:\t file1: " + str(events/df1.shape[0]) + '; file2: ' + str(events/df2.shape[0]))
+    print("Mean Difference Between 'good' events: " + str(total_diff/events))
 
     print('\n Data strings:')
     print(data_string1)
