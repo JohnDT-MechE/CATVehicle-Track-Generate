@@ -1,6 +1,6 @@
 {
     "ultrawide_front_long_1020_500": {
-        "video_source": "ultrawide_front_long.mp4",
+        "video_source": "ultrawide_front_long_edited.mp4",
         "video_output": "front_ultrawide_long_out.avi",
         "data_output": "data_front_ultrawide_long.csv",
         "width": 1020,
@@ -26,7 +26,7 @@
         "timestamp": 1689369347
     },
     "adversary_rear_right_1020_500": {
-        "video_source": "adversary_rear_right.mp4",
+        "video_source": "adversary_rear_right_edited.mp4",
         "video_output": "rear_adversary_out.avi",
         "data_output": "data_adversary_rear_right.csv",
         "width": 1020,
@@ -52,25 +52,25 @@
         "timestamp": 1689369483
     },
     "adversary_rear_left_1020_500": {
-        "video_source": "adversary_rear_left.mp4",
+        "video_source": "adversary_rear_left_edited.mp4",
         "video_output": "left_adversary_out.avi",
         "data_output": "data_adversary_left_right.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
-            "upper_1": [135, 317],
-            "upper_2": [487, 327],
-            "lower_1": [14, 332],
-            "lower_2": [462, 342],
+            "upper_1": [135, 260],
+            "upper_2": [560, 270],
+            "lower_1": [14, 270],
+            "lower_2": [560, 280],
             "offx": 4,
             "offuy": 5,
             "offly": 5
         },
         "right_line": {
-            "upper_1": [561, 333],
-            "upper_2": [926, 323],
-            "lower_1": [590, 343],
-            "lower_2": [1018, 333],
+            "upper_1": [600, 270],
+            "upper_2": [1020, 260],
+            "lower_1": [600, 280],
+            "lower_2": [1020, 270],
             "offx": 4,
             "offuy": 5,
             "offly": 5
