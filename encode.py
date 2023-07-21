@@ -102,8 +102,8 @@ if __name__ == "__main__":
 
     filter_timestamps(file1, file2, 3)
 
-    data1 = block_encoding(file1, 1689368390, block_size=10, num_blocks=10, time_gap = 0)
-    data2 = block_encoding(file2, 1689368390, block_size=10, num_blocks=10, time_gap = 0, reverse = True)
+    data1 = block_encoding(file1, 1689368390, block_size=10, num_blocks=20, time_gap = 0)
+    data2 = block_encoding(file2, 1689368390, block_size=10, num_blocks=20, time_gap = 0, reverse = True)
 
     total_accuracy = 0
     num_blocks_counted = 0
