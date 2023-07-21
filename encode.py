@@ -34,7 +34,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
 
     return blocks
 
-def filter_timestamps(file1, file2, cutoff):
+def filter_timestamps(file1, file2, cutoff, file):
     """
     Takes in two data sources, filters them to isolate events that occurred at a similar time (to remove erroneous events
     that aren't identified by both prespectives)
@@ -81,15 +81,15 @@ def filter_timestamps(file1, file2, cutoff):
                     data_string1 += gray_code[((int)(t1) % 32)] + normal_map[e1]
                     data_string2 += gray_code[((int)(t2) % 32)] + reverse_map[e2]
 
-    print("Number of good events: " + str(events))
-    print("Percentage of good events:\t file1: " + str(events/df1.shape[0]) + '; file2: ' + str(events/df2.shape[0]))
-    print("Mean Difference Between 'good' events: " + str(total_diff/events))
+    f.write("\n\nNumber of good events: " + str(events))
+    f.write("\nPercentage of good events:\t file1: " + str(events/df1.shape[0]) + '; file2: ' + str(events/df2.shape[0]))
+    f.write("\nMean Difference Between 'good' events: " + str(total_diff/events))
 
-    print('\n Filtered Data strings:')
-    print(data_string1)
-    print(data_string2)
+    f.write('\n Filtered Data strings:')
+    f.write('\n' + data_string1)
+    f.write('\n' + data_string2)
     
-    print((len(data_string1) - sum([1 if data_string1[index] != data_string2[index] else 0 for index in range(len(data_string1))])) / len(data_string1))
+    f.write('\n' + str((len(data_string1) - sum([1 if data_string1[index] != data_string2[index] else 0 for index in range(len(data_string1))])) / len(data_string1)))
 
             
 
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     file2 = "data-files/data_front_ultrawide_long.csv"
     #print(encode(file, flipped=False))
 
-    filter_timestamps(file1, file2, 3)
+    #filter_timestamps(file1, file2, 3)
 
     #time for rear left: 1689369626, 120 seconds long
     #time for normal ultrawide: 1689368390, 238 seconds long
@@ -110,7 +110,8 @@ if __name__ == "__main__":
     total_accuracy = 0
     num_blocks_counted = 0
 
-    with open('encoding-results/result_adversary_rear_left_v2.txt', 'w') as f:
+    with open('encoding-results/adversary_both_methods.txt', 'w') as f:
+        filter_timestamps(file1, file2, 3, file=f)
         for i in range(len(data1)):
             block1 = data1[i]
             block2 = data2[i]
@@ -130,7 +131,7 @@ if __name__ == "__main__":
             else:
                 accuracy_percent = 'N/A'
 
-            output = 'Block #: ' + str(i) + '\n\t Block one: ' + block1 + '\n\t Block two: ' + block2 + '\n\t Accuracy: ' + str(accuracy_percent) + '\n'
+            output = '\nBlock #: ' + str(i) + '\n\t Block one: ' + block1 + '\n\t Block two: ' + block2 + '\n\t Accuracy: ' + str(accuracy_percent) + '\n'
 
             f.write(output)
             print(output)
