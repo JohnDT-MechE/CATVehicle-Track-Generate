@@ -40,8 +40,50 @@ def encode(filename, flipped=False):
 
     return code
 
+def encode_event(t, e, reverse=False):
+    """
+    Encodes a single event event, adding it to data
+    """
+    gray_code = {}
+    for i in range(0, 1<<10):
+        gray=i^(i>>1)
+        gray_code[i] = "{0:0{1}b}".format(gray,5)
+
+    normal_map = {'in left': '00', 'in right': '01', 'out left':'10', 'out right':'11'}
+    reverse_map = {'out right': '00', 'out left': '01', 'in right':'10', 'in left':'11'}
+
+    return gray_code[((int)(t/2) % 32)] + normal_map[e] if not reverse else reverse_map[e]
+
+def block_encoding(filename, start_time, block_size, num_blocks, reverse=False):
+    """
+    Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
+    """
+    df = pd.read_csv(filename)
+
+    end_time = df.iloc[-1, 0]
+
+    blocks = ['' for i in range(num_blocks)]
+    
+    for _, entry in df.iterrows():
+        t = entry.iloc[0]
+        e = entry.iloc[1]
+
+        block = int(t - start_time)//block_size
+
+        if block >= 0 and block < num_blocks:
+            blocks[block] += (encode_event(t, e, reverse))
+
+    return blocks
+
+
 
 def filter_timestamps(file1, file2, cutoff):
+    """
+    Takes in two data sources, filters them to isolate events that occurred at a similar time (to remove erroneous events
+    that aren't identified by both prespectives)
+
+    Cutoff defines how far apart events can be to be considered 'at the same time'
+    """
     df1 = pd.read_csv(file1)
     df2 = pd.read_csv(file2)
 
@@ -76,11 +118,11 @@ def filter_timestamps(file1, file2, cutoff):
                     status = 'good' if reverse_map[e2] == normal_map[e1] else 'bad'
                     total_diff += abs(t1 - t2)
                     events += 1
-                    print('Match: ' + e1 + ' ' + e2 +'\t\t' + str(t1) + ' ' + str(t2) + '\tDiff: ' + str(int((t1 - t2)*100)/100) +  '\t' + status)
+                    print('Match: ' + e1 + ' ' + e2 +'  \t\t' + str(t1) + ' ' + str(t2) + '\tDiff: ' + str(int((t1 - t2)*100)/100) +  '\t' + status)
 
 
-                    data_string1 += gray_code[((int)(t1/2) % 32)] + normal_map[e1]
-                    data_string2 += gray_code[((int)(t2/2) % 32)] + reverse_map[e2]
+                    data_string1 += gray_code[((int)(t1) % 32)] + normal_map[e1]
+                    data_string2 += gray_code[((int)(t2) % 32)] + reverse_map[e2]
 
     print("Number of good events: " + str(events))
     print("Percentage of good events:\t file1: " + str(events/df1.shape[0]) + '; file2: ' + str(events/df2.shape[0]))
@@ -102,3 +144,6 @@ if __name__ == "__main__":
     #print(encode(file, flipped=False))
 
     filter_timestamps(file1, file2, 3)
+
+    print(block_encoding(file1, 1689368390, 10, 10))
+    print(block_encoding(file2, 1689368390, 10, 10))

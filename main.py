@@ -14,7 +14,7 @@ from tracker import*
 from counter import Counter, DataWriter
 
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
-configuration_name = 'adversary_rear_left_1020_500'
+configuration_name = 'ultrawide_front_long_1020_500'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
