@@ -96,21 +96,22 @@ def filter_timestamps(file1, file2, cutoff, file):
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
 if __name__ == "__main__":
-    file1 = "data-files/data_front_ultrawide.csv"
-    file2 = "data-files/data_rear_ultrawide.csv"
+    file1 = "data-files/data_adversary_rear_left.csv"
+    file2 = "data-files/data_front_ultrawide_long.csv"
     #print(encode(file, flipped=False))
 
     #filter_timestamps(file1, file2, 3)
 
     #time for rear left: 1689369626, 120 seconds long
     #time for normal ultrawide: 1689368390, 238 seconds long
-    data1 = block_encoding(file1, 1689368390, block_size=10, num_blocks=23, time_gap = 0)
-    data2 = block_encoding(file2, 1689368390, block_size=10, num_blocks=23, time_gap = 0, reverse = True)
+    #time for rear right: 1689369483, 117 seconds long
+    data1 = block_encoding(file1, 1689369626, block_size=10, num_blocks=12, time_gap = 0)
+    data2 = block_encoding(file2, 1689369626, block_size=10, num_blocks=12, time_gap = 0, reverse = True)
 
     total_accuracy = 0
     num_blocks_counted = 0
 
-    with open('encoding-results/normal_one_hot.txt', 'w') as f:
+    with open('encoding-results/adversary_left_one_hot.txt', 'w') as f:
         filter_timestamps(file1, file2, 3, file=f)
         for i in range(len(data1)):
             block1 = data1[i]
