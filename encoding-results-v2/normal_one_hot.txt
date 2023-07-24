@@ -1,0 +1,126 @@
+
+
+Number of good events: 21
+Percentage of good events:	 file1: 0.6774193548387096; file2: 0.9545454545454546
+Mean Difference Between 'good' events: 1.4095237709227062
+ Filtered Data strings:
+000110010001000010110000010110000010111101000101001000001110010110000010110000010111110010111110010111010010101010010101010010001000010010100010010100010110100100111000100010110010101110010
+000100010001000010010000010110000010110101000111001000001100010010000010110010010111100010111110010111000010101000010101010010001010010011100010010100010110100100101010100010110010101110010
+0.9259259259259259
+Block #: 0
+	 Block one: 000111000000111000000101000001001000
+	 Block two: 000101000001001000
+	 Accuracy: 0.7777777777777778
+
+Block #: 1
+	 Block one: 
+	 Block two: 
+	 Accuracy: N/A
+
+Block #: 2
+	 Block one: 110001000110001000
+	 Block two: 010001000110001000
+	 Accuracy: 0.9444444444444444
+
+Block #: 3
+	 Block one: 111100100
+	 Block two: 110100100
+	 Accuracy: 0.8888888888888888
+
+Block #: 4
+	 Block one: 101000100
+	 Block two: 111000100
+	 Accuracy: 0.8888888888888888
+
+Block #: 5
+	 Block one: 
+	 Block two: 
+	 Accuracy: N/A
+
+Block #: 6
+	 Block one: 001111000
+	 Block two: 001101000
+	 Accuracy: 0.8888888888888888
+
+Block #: 7
+	 Block one: 
+	 Block two: 
+	 Accuracy: N/A
+
+Block #: 8
+	 Block one: 011100010
+	 Block two: 010001000
+	 Accuracy: 0.5555555555555556
+
+Block #: 9
+	 Block one: 110001000110111000
+	 Block two: 110011000111101000
+	 Accuracy: 0.8333333333333334
+
+Block #: 10
+	 Block one: 111111000111011000101011000
+	 Block two: 111111000111001000101001000101011000
+	 Accuracy: 0.8333333333333334
+
+Block #: 11
+	 Block one: 101111000101100001
+	 Block two: 
+	 Accuracy: 0.5
+
+Block #: 12
+	 Block one: 
+	 Block two: 
+	 Accuracy: N/A
+
+Block #: 13
+	 Block one: 001001000001001000
+	 Block two: 001011000
+	 Accuracy: 0.8333333333333334
+
+Block #: 14
+	 Block one: 010101000010111000
+	 Block two: 011101000010101000
+	 Accuracy: 0.8888888888888888
+
+Block #: 15
+	 Block one: 010010001
+	 Block two: 
+	 Accuracy: 0.6666666666666666
+
+Block #: 16
+	 Block one: 110100010111010010111000010
+	 Block two: 110100010
+	 Accuracy: 0.6666666666666666
+
+Block #: 17
+	 Block one: 
+	 Block two: 101010010
+	 Accuracy: 0.5555555555555556
+
+Block #: 18
+	 Block one: 100110100
+	 Block two: 
+	 Accuracy: 0.5555555555555556
+
+Block #: 19
+	 Block one: 
+	 Block two: 
+	 Accuracy: N/A
+
+Block #: 20
+	 Block one: 
+	 Block two: 
+	 Accuracy: N/A
+
+Block #: 21
+	 Block one: 010111000010001000
+	 Block two: 010111000
+	 Accuracy: 0.8888888888888888
+
+Block #: 22
+	 Block one: 110101000
+	 Block two: 
+	 Accuracy: 0.5555555555555556
+
+
+Average Accuracy: 0.7483660130718953
