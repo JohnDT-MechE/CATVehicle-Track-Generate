@@ -36,7 +36,6 @@ def encode_zone(filename, start_time, length):
         num = entry.iloc[-1]
 
         if t > start_time and t < start_time + length:
-            print('counted')
             num_vehicles += int(num)
             num_frames += 1
 
@@ -211,10 +210,10 @@ def graphs():
         for res in range(1,8):
             n = length//i
             
-            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name = 'data-files/data_adversary_rear_left_zone.csv')
-            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name = 'data-files/data_adversary_rear_right_zone.csv')
-            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name = 'data-files/data_front_ultrawide_long_zone.csv')
-            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name = 'data-files/data_front_ultrawide_long_zone.csv')
+            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name = None)
+            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name = None)
+            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name = None)
+            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name = None)
             front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name = 'data-files/data_front_ultrawide_zone.csv')
             rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name = 'data-files/data_rear_ultrawide_zone.csv')
 
@@ -315,7 +314,8 @@ def graphs():
 
 
 if __name__ == "__main__":
-    front_normal = "data-files/data_front_ultrawide.csv"
-    rear_normal = "data-files/data_rear_ultrawide.csv"
+    graphs()
+    #front_normal = "data-files/data_front_ultrawide.csv"
+    #rear_normal = "data-files/data_rear_ultrawide.csv"
 
-    print(block_encoding(front_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = 'data-files/data_front_ultrawide_zone.csv'))
+    #print(block_encoding(front_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = 'data-files/data_front_ultrawide_zone.csv'))
