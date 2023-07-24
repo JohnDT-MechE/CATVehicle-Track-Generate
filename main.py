@@ -13,9 +13,9 @@ import json
 from tracker import*
 from counter import Counter, DataWriter
 
-# NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT
+# NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
-configuration_name = 'ultrawide_front_long_1020_500'
+configuration_name = 'ultrawide_front_1020_500'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
@@ -111,6 +111,7 @@ rightx_area2 = 1020
 
 #create a new instance of the datawriter class to record the data we gather
 data_writer = DataWriter(data_output)
+zone_writer = DataWriter(data_output_zone)
 
 
 #loop through the video
@@ -122,8 +123,8 @@ for _ in tqdm.tqdm(range(vid_length)):
     #this limits the effective framerate of what we are looking at to 10
     if count % (framerate/10) != 0:
         continue
+   
     #resize the frame according to the size specifid in the JSON configuration
-
     frame=cv2.resize(frame,size)
    
     #run YOLOv8 on the frame
@@ -270,14 +271,8 @@ for _ in tqdm.tqdm(range(vid_length)):
     cv2.putText(frame,('End Zone 2'),(850,425),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2) # Bottom Zone 2
     
     # Processes length of "Zone" Counter and Prints it to screen
-    czone1 = (len(counter_in_zone1))
-    cv2.putText(frame,('In Zone 1: ')+str(czone1),(40,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
-    
-    czone2 = (len(counter_in_zone2))
-    cv2.putText(frame,('In Zone 2: ')+str(czone2),(840,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
-    
-    czone_total = ((len(counter_in_zone1)) + (len(counter_in_zone2)))
-    cv2.putText(frame,('In All Zones: ')+str(czone_total),(450,50),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    czone = (len(counter_in_zone))
+    cv2.putText(frame,('In Zone:')+str(czone),(40,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
     
     #gets the number of cars in and out by counting the length of the arrays
     cin_Left = (len(counter_in_left)) # counter for in left
@@ -304,3 +299,4 @@ out.release()
 cv2.destroyAllWindows()
 
 data_writer.store_data()
+zone_writer.store_data()
