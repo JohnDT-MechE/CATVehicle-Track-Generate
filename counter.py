@@ -18,7 +18,7 @@ class DataWriter:
         self.data
         """
         rounded_time = int(time*100) / 100
-        self.data.append((rounded_time, event))
+        self.data.append((rounded_time, [e for e in event]))
 
 
     def print(self):

@@ -16,6 +16,35 @@ def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
 
     return gray_code[int(t/(1<<bits_to_drop)) % (1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
 
+def encode_zone(filename, start_time, end_time):
+    """
+    Takes in a file with sequential data about how many vehicles are in a zone at any given time
+    Takes the average number of vehicles over the time period
+    """
+    gray_code = {}
+    for i in range(0, 1<<10):
+        gray=i^(i>>1)
+        gray_code[i] = "{0:0{1}b}".format(gray,5)
+
+    df = pd.read_csv(filename)
+
+    num_frames = 0
+    num_vehicles = 0
+
+    for _, entry in df.iterrows():
+        t = entry.iloc[0]
+        num = entry.iloc[1]
+
+        if t > start_time and t < end_time:
+            num_vehicles += num
+            num_frames += 1
+
+    average_vehicles = num_vehicles/num_frames
+
+    return gray_
+
+    
+
 def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1):
     """
     Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
