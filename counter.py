@@ -104,6 +104,10 @@ class Counter:
         This function checks if the coordinates of a point passed in as x and y are within the offsets of the upper line
         """
         #check if the point is within the x axis boundaries
+        #calculates the "slopes" of the two lines for checking if points are within lines in the future
+        self.slope_upper = (self.upper_y2-self.upper_y1)/(self.upper_x2-self.upper_x1)
+        self.slope_lower = (self.lower_y2-self.lower_y1)/(self.lower_x2-self.lower_x1)
+
         if (self.upper_x1-self.offset_x) < x and (self.upper_x2+self.offset_x) > x:
             #calculate the "expected" y value a.k.a. the y value of the line at the x coordinate passed in
             expected_y = (x-self.upper_x1)*self.slope_upper + self.upper_y1
@@ -116,6 +120,10 @@ class Counter:
         """
         This function checks if the coordinates of a point passed in as x and y are within the offsets of the upper line
         """
+        #calculates the "slopes" of the two lines for checking if points are within lines in the future
+        self.slope_upper = (self.upper_y2-self.upper_y1)/(self.upper_x2-self.upper_x1)
+        self.slope_lower = (self.lower_y2-self.lower_y1)/(self.lower_x2-self.lower_x1)
+        
         #check if the point is within the x axis boundaries
         if (self.lower_x1-self.offset_x) < x and (self.lower_x2+self.offset_x) > x:
             #calculate the "expected" y value a.k.a. the y value of the line at the x coordinate passed in
