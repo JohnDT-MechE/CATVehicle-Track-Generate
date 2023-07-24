@@ -67,37 +67,40 @@ class Counter:
         self.slope_upper = (self.upper_y2-self.upper_y1)/(self.upper_x2-self.upper_x1)
         self.slope_lower = (self.lower_y2-self.lower_y1)/(self.lower_x2-self.lower_x1)
 
-    def update_y(self, new_y):
+    def update_upper_point(self, new_y, new_x, side):
         """
         Updates the y-axis of the lines in the counter
         First finds the side with the lower lines, and assumes these are the points that need to be updated
         Sets the point calculated as the upper_y on the correct side to be equal to new_y
         """
 
-        #if self.upper_y1 is lower down on the video (higher y value)
-        if self.upper_y1 > self.upper_y2:
-            #get the differences in y_values based on the current y_values
-            upper_dif = self.upper_y2 - self.upper_y1
-            lower_dif = self.lower_y2 - self.lower_y1
-            #if upper_y1 is lower, then we want to update y1 for both the top and bottom lines
-            y_difference = self.lower_y1 - self.upper_y1
+        if side == 1:
+            y_move = new_y - self.upper_y1
+            x_move = new_x - self.upper_x1
+
+            #move each point:
             self.upper_y1 = new_y
-            self.lower_y1 = new_y + y_difference
-            #now that we have updated the inside, we must update the outer y values using the slope
-            self.upper_y2 = self.upper_y1 + upper_dif
-            self.lower_y2 = self.lower_y1 + lower_dif
-        #if self.upper_y1 is lower down on the video (higher y value)
-        else:
-            #get the differences in y_values based on the current y_values
-            upper_dif = self.upper_y1 - self.upper_y2
-            lower_dif = self.lower_y1 - self.lower_y2
-            #if upper_y1 is lower, then we want to update y1 for both the top and bottom lines
-            y_difference = self.lower_y2 - self.upper_y2
+            self.upper_x1 = new_x
+            self.upper_y2 += y_move
+            self.upper_x2 += x_move
+            self.lower_y1 += y_move
+            self.lower_x1 += x_move
+            self.lower_y2 += y_move
+            self.lower_x2 += x_move
+        if side == 1:
+            y_move = new_y - self.upper_y2
+            x_move = new_x - self.upper_x2
+
+            #move each point:
             self.upper_y2 = new_y
-            self.lower_y2 = new_y + y_difference
-            #now that we have updated the inside, we must update the outer y values using the slope
-            self.upper_y1 = self.upper_y2 + upper_dif
-            self.lower_y1 = self.lower_y2 + lower_dif
+            self.upper_x2 = new_x
+            self.upper_y1 += y_move
+            self.upper_x1 += x_move
+            self.lower_y1 += y_move
+            self.lower_x1 += x_move
+            self.lower_y2 += y_move
+            self.lower_x2 += x_move
+        
 
     def within_upper_line(self, x, y):
         """
