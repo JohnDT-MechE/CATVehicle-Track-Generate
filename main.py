@@ -271,8 +271,14 @@ for _ in tqdm.tqdm(range(vid_length)):
     cv2.putText(frame,('End Zone 2'),(850,425),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2) # Bottom Zone 2
     
     # Processes length of "Zone" Counter and Prints it to screen
-    czone = (len(counter_in_zone))
-    cv2.putText(frame,('In Zone:')+str(czone),(40,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    czone1 = (len(counter_in_zone1))
+    cv2.putText(frame,('In Zone 1: ')+str(czone1),(40,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    
+    czone2 = (len(counter_in_zone2))
+    cv2.putText(frame,('In Zone 2: ')+str(czone2),(840,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    
+    czone_total = ((len(counter_in_zone1)) + (len(counter_in_zone2)))
+    cv2.putText(frame,('In All Zones: ')+str(czone_total),(450,50),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
     
     #gets the number of cars in and out by counting the length of the arrays
     cin_Left = (len(counter_in_left)) # counter for in left
