@@ -81,6 +81,8 @@ vh_out_left = {}
 vh_in_right = {}
 vh_out_right = {}
 
+vh_in_zone = {}
+
 #This section holds IDs of cars that have gone into and out of frame on left and right
 #These are the counters that are updated when a car passes across the lines
 counter_in_left = []
@@ -88,6 +90,12 @@ counter_out_left = []
 
 counter_in_right = []
 counter_out_right = []
+
+counter_in_zone = []
+
+# Variables for "Area" Counter
+start_area_y = 330
+end_area_y = 435
 
 #create a new instance of the datawriter class to record the data we gather
 data_writer = DataWriter(data_output)
@@ -114,6 +122,10 @@ for _ in tqdm.tqdm(range(vid_length)):
     px=pd.DataFrame(a).astype("float")
 
     list=[]
+    
+    # Clears the "Zone" Counter Lists every time a frame is looked at
+    vh_in_zone.clear()
+    counter_in_zone.clear()
              
     # Object Tracker
 
@@ -207,6 +219,15 @@ for _ in tqdm.tqdm(range(vid_length)):
                     counter_out_right.append(id)
                     data_writer.add_event('out right', start_time + count/framerate)
                     
+        # Counting Vehicles in "Area"      
+        if lower_quarter_center_y > (start_area_y) and lower_quarter_center_y < (end_area_y):
+            vh_in_zone[id] = lower_quarter_center_y
+            cv2.circle(frame,(center_x,lower_quarter_center_y),4,(0,0,255),-1) # Draw circle
+            cv2.putText(frame,str(id),(center_x,lower_quarter_center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+        if id in vh_in_zone:
+            if id not in counter_in_zone:
+                counter_in_zone.append(id)           
+                    
     #this part annotates the lines on the frame
     cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255))
     cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(255,0,0))
@@ -217,6 +238,10 @@ for _ in tqdm.tqdm(range(vid_length)):
     
     cv2.line(frame,(135,435),(1018,435),(0,255,0),1) 
     cv2.putText(frame,('End Zone'),(135,425),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    
+    # Processes length of "Zone" Counter and Prints it
+    czone = (len(counter_in_zone))
+    cv2.putText(frame,('In Zone:')+str(czone),(135,340),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
     
     #gets the number of cars in and out by counting the length of the arrays
     cin_Left = (len(counter_in_left)) # counter for in left
