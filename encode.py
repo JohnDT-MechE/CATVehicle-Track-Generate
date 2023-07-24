@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def encode_event(t, e, reverse=False, time_resolution=4):
+def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
     """
     Encodes a single event event, adding it to data
     """
@@ -14,9 +14,9 @@ def encode_event(t, e, reverse=False, time_resolution=4):
     normal_map = {'in left': '0001', 'in right': '0010', 'out left':'1000', 'out right':'0100'}
     reverse_map = {'out right': '0001', 'out left': '0010', 'in right':'1000', 'in left':'0100'}
 
-    return gray_code[int(t/2) % (1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
+    return gray_code[int(t/(1<<bits_to_drop)) % (1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
 
-def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4):
+def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1):
     """
     Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
     """
@@ -31,11 +31,11 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
         block = int(t - start_time)//(block_size+time_gap)
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
-            blocks[block] += (encode_event(t, e, reverse, time_resolution=tres))
+            blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=1))
 
     return blocks
 
-def filter_timestamps(file1, file2, cutoff, file):
+def filter_timestamps(file1, file2, cutoff, f):
     """
     Takes in two data sources, filters them to isolate events that occurred at a similar time (to remove erroneous events
     that aren't identified by both prespectives)
@@ -178,12 +178,12 @@ if __name__ == "__main__":
         for res in range(1,8):
             n = length//i
             
-            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res)
-            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res)
-            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res)
-            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res)
-            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res)
-            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res)
+            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=0)
+            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=0)
+            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=0)
+            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=0)
+            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=0)
+            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=0)
 
             data_normal.append(validate_block(front_block, rear_block))
             data_right.append(validate_block(rear_right_block, front_right_block))
@@ -222,5 +222,5 @@ if __name__ == "__main__":
         ax[i].set_title(f"Block Size of {i}")
 
     fig1.suptitle("Similarity Percentage with respect to Time Resolution at Various Block Sizes")
-    fig1.savefig('figures/Similarity-Time-Resolution-Block-Size.png', dpi = 300, bbox_inches='tight')
+    fig1.savefig('figures/Similarity-Time-Resolution-Block-Size-Prserved-Bits.png', dpi = 300, bbox_inches='tight')
     plt.show()
