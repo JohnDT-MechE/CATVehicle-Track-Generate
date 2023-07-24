@@ -14,9 +14,9 @@ def encode_event(t, e, reverse=False, time_resolution=4):
     normal_map = {'in left': '0001', 'in right': '0010', 'out left':'1000', 'out right':'0100'}
     reverse_map = {'out right': '0001', 'out left': '0010', 'in right':'1000', 'in left':'0100'}
 
-    return gray_code[((int)(t/2) % 1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
+    return gray_code[int(t/2) % (1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
 
-def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, time_resolution=4):
+def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4):
     """
     Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
     """
@@ -31,7 +31,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
         block = int(t - start_time)//(block_size+time_gap)
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
-            blocks[block] += (encode_event(t, e, reverse, time_resolution=time_resolution))
+            blocks[block] += (encode_event(t, e, reverse, time_resolution=tres))
 
     return blocks
 
@@ -163,54 +163,64 @@ if __name__ == "__main__":
     data_normal = []
     data_right = []
     data_left = []
-    block_length = []
+    X = []
 
-    for i in range(5, 40, 1):
+    fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, layout="constrained")
 
-        n = length//i
+
+    ax = {5: ax1, 15: ax2, 25: ax3, 35: ax4}
+
+    for i in [5, 15, 25, 35]:
+        data_normal = []
+        data_right = []
+        data_left = []
+        X = []
+        for res in range(1,8):
+            n = length//i
+            
+            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res)
+            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res)
+            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res)
+            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res)
+            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res)
+            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res)
+
+            data_normal.append(validate_block(front_block, rear_block))
+            data_right.append(validate_block(rear_right_block, front_right_block))
+            data_left.append(validate_block(rear_left_block, front_left_block))
+            X.append(res)
+
+        #print(data_normal)
+        #print(data_right)
+        #print(data_left)
+        #print(X)
+
+        ax[i].set_ylim([0.65, 0.9])
+        ax[i].set_xlim([0.5, 7.5])
         
-        rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
-        rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
-        front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0)
-        front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0)
-        front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0)
-        rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
 
-        data_normal.append(validate_block(front_block, rear_block))
-        data_right.append(validate_block(rear_right_block, front_right_block))
-        data_left.append(validate_block(rear_left_block, front_left_block))
-        block_length.append(i)
+        ax[i].scatter(X, data_normal)
+        ax[i].scatter(X, data_right)
+        ax[i].scatter(X, data_left)
 
-    print(data_normal)
-    print(data_right)
-    print(data_left)
-    print(block_length)
+        ax[i].legend(['Normal', 'Adversary Right','Adversary Left'], prop={'size': 6})
 
-    fig1 = plt.figure()
-    ax = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
+        #plot the lines of best fit
+        a,b = best_fit(X, data_normal)
+        yfit = [a + b * xi for xi in X]
+        ax[i].plot(X, yfit)
+        a,b = best_fit(X, data_right)
+        yfit = [a + b * xi for xi in X]
+        ax[i].plot(X, yfit)
+        a,b = best_fit(X, data_left)
+        yfit = [a + b * xi for xi in X]
+        ax[i].plot(X, yfit)
 
-    ax.scatter(block_length, data_normal)
-    ax.scatter(block_length, data_right)
-    ax.scatter(block_length, data_left)
+        #show the image
+        ax[i].set_xlabel("Time Resolution (bits)")
+        ax[i].set_ylabel("Percent Similarity")
+        ax[i].set_title(f"Block Size of {i}")
 
-    ax.legend(['Normal', 'Adversary Right','Adversary Left'])
-
-    #plot the lines of best fit
-    a,b = best_fit(block_length, data_normal)
-    yfit = [a + b * xi for xi in block_length]
-    ax.plot(block_length, yfit)
-    a,b = best_fit(block_length, data_right)
-    yfit = [a + b * xi for xi in block_length]
-    ax.plot(block_length, yfit)
-    a,b = best_fit(block_length, data_left)
-    yfit = [a + b * xi for xi in block_length]
-    ax.plot(block_length, yfit)
-
-    #show the image
-    ax.set_xlabel("Block Length")
-    ax.set_ylabel("Percent Similarity")
-    ax.set_title("Percent Similarity with respect to Block Encoding Length")
-    
-
-    fig1.savefig('figures/Similarity-Block-Length.png', dpi = 300, bbox_inches='tight')
+    fig1.suptitle("Similarity Percentage with respect to Time Resolution at Various Block Sizes")
+    fig1.savefig('figures/Similarity-Time-Resolution-Block-Size.png', dpi = 300, bbox_inches='tight')
     plt.show()
