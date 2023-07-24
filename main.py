@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 21 July 2023
+# Last updated 24 July 2023
 
 import cv2
 import pandas as pd
@@ -210,6 +210,13 @@ for _ in tqdm.tqdm(range(vid_length)):
     #this part annotates the lines on the frame
     cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255))
     cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(255,0,0))
+    
+    # Annotates the lines of the "Zone"
+    cv2.line(frame,(135,330),(1018,330),(0,255,0),1) 
+    cv2.putText(frame,('Begin Zone'),(135,307),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2) 
+    
+    cv2.line(frame,(135,435),(1018,435),(0,255,0),1) 
+    cv2.putText(frame,('End Zone'),(135,425),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
     
     #gets the number of cars in and out by counting the length of the arrays
     cin_Left = (len(counter_in_left)) # counter for in left
