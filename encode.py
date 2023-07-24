@@ -31,7 +31,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
         block = int(t - start_time)//(block_size+time_gap)
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
-            blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=1))
+            blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=bits_to_drop))
 
     return blocks
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     X = []
 
     fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, layout="constrained")
-
+    fig2, ((bx)) = plt.subplots(1, 1, layout="constrained")
 
     ax = {5: ax1, 15: ax2, 25: ax3, 35: ax4}
 
@@ -178,12 +178,12 @@ if __name__ == "__main__":
         for res in range(1,8):
             n = length//i
             
-            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=0)
-            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=0)
-            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=0)
-            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=0)
-            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=0)
-            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=0)
+            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1)
+            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1)
+            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1)
+            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1)
+            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1)
+            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1)
 
             data_normal.append(validate_block(front_block, rear_block))
             data_right.append(validate_block(rear_right_block, front_right_block))
@@ -222,5 +222,60 @@ if __name__ == "__main__":
         ax[i].set_title(f"Block Size of {i}")
 
     fig1.suptitle("Similarity Percentage with respect to Time Resolution at Various Block Sizes")
-    fig1.savefig('figures/Similarity-Time-Resolution-Block-Size-Prserved-Bits.png', dpi = 300, bbox_inches='tight')
+    fig1.savefig('figures/Time-and-Block-Size.png', dpi = 300, bbox_inches='tight')
+
+    data_normal = []
+    data_right = []
+    data_left = []
+    X = []
+    for i in range(5, 35):
+        n = length//i
+        
+        rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
+        rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
+        front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0)
+        front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0)
+        front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0)
+        rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
+
+        data_normal.append(validate_block(front_block, rear_block))
+        data_right.append(validate_block(rear_right_block, front_right_block))
+        data_left.append(validate_block(rear_left_block, front_left_block))
+        X.append(i)
+
+    #print(data_normal)
+    #print(data_right)
+    #print(data_left)
+    #print(X)
+
+    bx.set_ylim([0.6, 0.9])
+    bx.set_xlim([4, 36])
+    
+
+    bx.scatter(X, data_normal)
+    bx.scatter(X, data_right)
+    bx.scatter(X, data_left)
+
+    bx.legend(['Normal', 'Adversary Right','Adversary Left'])
+
+    #plot the lines of best fit
+    a,b = best_fit(X, data_normal)
+    yfit = [a + b * xi for xi in X]
+    bx.plot(X, yfit)
+    a,b = best_fit(X, data_right)
+    yfit = [a + b * xi for xi in X]
+    bx.plot(X, yfit)
+    a,b = best_fit(X, data_left)
+    yfit = [a + b * xi for xi in X]
+    bx.plot(X, yfit)
+
+    #show the image
+    bx.set_xlabel("Block Length (seconds)")
+    bx.set_ylabel("Percent Similarity")
+
+    fig2.suptitle("Similarity Percentage with respect to Block Length")
+    fig2.savefig('figures/Similarity-Block-Length.png', dpi = 300, bbox_inches='tight')
+    
+    
+    
     plt.show()
