@@ -15,7 +15,7 @@ from counter import Counter, DataWriter
 
 # NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
-configuration_name = 'ultrawide_front_1020_500'
+configuration_name = 'ultrawide_rear_1020_500'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
@@ -116,7 +116,7 @@ rightx_area2 = 1020
 
 #create a new instance of the datawriter class to record the data we gather
 data_writer = DataWriter(data_output)
-zone_writer = DataWriter(data_output_zone)
+zone_writer = DataWriter(data_output_zone, header='time,left,right,total')
 
 
 #loop through the video
