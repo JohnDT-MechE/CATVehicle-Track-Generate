@@ -13,9 +13,9 @@ import json
 from tracker import*
 from counter import Counter, DataWriter
 
-# NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT
+# NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
-configuration_name = 'ultrawide_front_long_1020_500'
+configuration_name = 'ultrawide_front_1020_500'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
@@ -43,6 +43,10 @@ with open("configurations.json") as configuration:
     video_source = config['video_source']
     video_output = config['video_output']
     data_output = config['data_output']
+    try:
+        data_output_zone = config['data_output_zone']
+    except:
+        data_output_zone = 'data.csv'
 
     # JSON configurations have two objects, one for the left line locations and offsets, and one for the right line
     l_config = config['left_line']
@@ -102,6 +106,7 @@ end_area_y = 435
 
 #create a new instance of the datawriter class to record the data we gather
 data_writer = DataWriter(data_output)
+zone_writer = DataWriter(data_output_zone)
 
 
 #loop through the video
@@ -113,8 +118,8 @@ for _ in tqdm.tqdm(range(vid_length)):
     #this limits the effective framerate of what we are looking at to 10
     if count % (framerate/10) != 0:
         continue
+   
     #resize the frame according to the size specifid in the JSON configuration
-
     frame=cv2.resize(frame,size)
    
     #run YOLOv8 on the frame
@@ -245,6 +250,8 @@ for _ in tqdm.tqdm(range(vid_length)):
     # Processes length of "Zone" Counter and Prints it to screen
     czone = (len(counter_in_zone))
     cv2.putText(frame,('In Zone:')+str(czone),(40,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    # records the length of "Zone" Counter
+    zone_writer.add_event(str(czone), start_time + count/framerate)
     
     #gets the number of cars in and out by counting the length of the arrays
     cin_Left = (len(counter_in_left)) # counter for in left
@@ -271,3 +278,4 @@ out.release()
 cv2.destroyAllWindows()
 
 data_writer.store_data()
+zone_writer.store_data()
