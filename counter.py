@@ -87,7 +87,7 @@ class Counter:
             self.lower_x1 += x_move
             self.lower_y2 += y_move
             self.lower_x2 += x_move
-        if side == 1:
+        if side == 2:
             y_move = new_y - self.upper_y2
             x_move = new_x - self.upper_x2
 
