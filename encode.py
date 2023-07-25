@@ -315,8 +315,16 @@ def graphs():
 
 
 if __name__ == "__main__":
-    graphs()
-    #front_normal = "data-files/data_front_ultrawide.csv"
-    #rear_normal = "data-files/data_rear_ultrawide.csv"
+    #graphs()
+    front_normal = "data-files/data_front_ultrawide.csv"
+    rear_normal = "data-files/data_rear_ultrawide.csv"
+    #front_zone = 'data-zone/data_front_ultrawide_zone.csv'
+    #rear_zone = 'data-zone/data_rear_ultrawide_zone.csv'
 
-    #print(block_encoding(front_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = 'data-files/data_front_ultrawide_zone.csv'))
+    front_zone = None
+    rear_zone = None
+
+    front = block_encoding(front_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, reverse=True, zone_name = front_zone)
+    rear = block_encoding(rear_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = rear_zone)
+
+    print(validate_block(front, rear))
