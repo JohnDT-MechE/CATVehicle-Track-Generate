@@ -3,7 +3,7 @@
         "video_source": "ultrawide_front_long_edited.mp4",
         "video_output": "front_ultrawide_long_out.avi",
         "data_output": "data-files/data_front_ultrawide_long.csv",
-        "data_output_zone": "data-files/data_front_ultrawide_long_zone.csv",
+        "data_output_zone": "data-zone/data_front_ultrawide_long_zone.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -24,13 +24,18 @@
             "offuy": 5,
             "offly": 5
         },
+        "zone": {
+            "y": [330, 435],
+            "x_1": [0, 485],
+            "x_2": [550, 1020]
+        },
         "timestamp": 1689369347
     },
     "adversary_rear_right_1020_500": {
         "video_source": "adversary_rear_right_edited.mp4",
         "video_output": "rear_adversary_out.avi",
         "data_output": "data-files/data_adversary_rear_right.csv",
-        "data_output_zone": "data-files/data_adversary_rear_right_zone.csv",
+        "data_output_zone": "data-zone/data_adversary_rear_right_zone.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -51,13 +56,18 @@
             "offuy": 5,
             "offly": 5
         },
+        "zone": {
+            "y": [270, 330],
+            "x_1": [0, 420],
+            "x_2": [470, 1020]
+        },
         "timestamp": 1689369483
     },
     "adversary_rear_left_1020_500": {
         "video_source": "adversary_rear_left_edited.mp4",
         "video_output": "left_adversary_out.avi",
         "data_output": "data-files/data_adversary_rear_left.csv",
-        "data_output_zone": "data-files/data_adversary_rear_left_zone.csv",
+        "data_output_zone": "data-zone/data_adversary_rear_left_zone.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -77,6 +87,11 @@
             "offx": 4,
             "offuy": 5,
             "offly": 5
+        },
+        "zone": {
+            "y": [270, 330],
+            "x_1": [0, 560],
+            "x_2": [600, 1020]
         },
         "timestamp": 1689369626
     },
@@ -109,7 +124,7 @@
         "video_source": "ultrawide_front_edited.mp4",
         "video_output": "ultrawide_front_output.avi",
         "data_output": "data-files/data_front_ultrawide.csv",
-        "data_output_zone": "data-files/data_front_ultrawide_zone.csv",
+        "data_output_zone": "data-zone/data_front_ultrawide_zone.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -130,13 +145,18 @@
             "offuy": 5,
             "offly": 5
         },
+        "zone": {
+            "y": [330, 435],
+            "x_1": [0, 485],
+            "x_2": [550, 1020]
+        },
         "timestamp": 1689368352
     },
     "ultrawide_rear_1020_500": {
         "video_source": "ultrawide_rear_edited.mp4",
         "video_output": "ultrawide_rear_output.avi",
         "data_output": "data-files/data_rear_ultrawide.csv",
-        "data_output_zone": "data-files/data_rear_ultrawide_zone.csv",
+        "data_output_zone": "data-zone/data_rear_ultrawide_zone.csv",
         "width": 1020,
         "height": 500,
         "left_line": {
@@ -156,6 +176,11 @@
             "offx": 4,
             "offuy": 5,
             "offly": 5
+        },
+        "zone": {
+            "y": [330, 435],
+            "x_1": [0, 485],
+            "x_2": [550, 1020]
         },
         "timestamp": 1689368367
     },

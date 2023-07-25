@@ -15,7 +15,7 @@ from counter import Counter, DataWriter
 
 # NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
-configuration_name = 'adversary_rear_left_1020_500'
+configuration_name = 'ultrawide_front_long_1020_500'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
@@ -62,6 +62,20 @@ with open("configurations.json") as configuration:
                 offx=r_config['offx'], offuy=r_config['offuy'], offly=r_config['offly'])
     
 
+    # Variables for Zone Counter
+    # CONFIG ZONE LINES HERE
+    zone = config['zone']
+
+    start_area_y = zone['y'][0]
+    end_area_y = zone['y'][1]
+
+    leftx_area1 = zone['x_1'][0]
+    rightx_area1 = zone['x_1'][1]
+
+    leftx_area2 = zone['x_2'][0]
+    rightx_area2 = zone['x_2'][1]
+    
+
 cap=cv2.VideoCapture(video_source)
 
 vid_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -103,16 +117,7 @@ counter_out_right = []
 counter_in_zone1 = []
 counter_in_zone2 = []
 
-# Variables for Zone Counter
-# CONFIG ZONE LINES HERE
-start_area_y = 330
-end_area_y = 435
 
-leftx_area1 = 0
-rightx_area1 = 485
-
-leftx_area2 = 550
-rightx_area2 = 1020
 
 #create a new instance of the datawriter class to record the data we gather
 data_writer = DataWriter(data_output)
@@ -264,16 +269,16 @@ for _ in tqdm.tqdm(range(vid_length)):
     
     # Annotates the lines of the "Zone"
     cv2.line(frame,(leftx_area1,start_area_y),(rightx_area1,start_area_y),(0,255,0),1) 
-    cv2.putText(frame,('Begin Zone 1'),(10,320),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2) # Top Zone 1
+    cv2.putText(frame,('Begin Zone 1'),(10,start_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Top Zone 1
     
     cv2.line(frame,(leftx_area1,end_area_y),(rightx_area1,end_area_y),(0,255,0),1) 
-    cv2.putText(frame,('End Zone 1'),(10,425),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2) # Bottom Zone 1
+    cv2.putText(frame,('End Zone 1'),(10,end_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Bottom Zone 1
     
     cv2.line(frame,(leftx_area2,start_area_y),(rightx_area2,start_area_y),(0,255,0),1) 
-    cv2.putText(frame,('Begin Zone 2'),(850,320),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2) # Top Zone 2
+    cv2.putText(frame,('Begin Zone 2'),(850,start_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Top Zone 2
     
     cv2.line(frame,(leftx_area2,end_area_y),(rightx_area2,end_area_y),(0,255,0),1) 
-    cv2.putText(frame,('End Zone 2'),(850,425),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2) # Bottom Zone 2
+    cv2.putText(frame,('End Zone 2'),(850,end_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Bottom Zone 2
     
     # Processes length of "Zone" Counter and Prints it to screen
     czone1 = (len(counter_in_zone1))
