@@ -8,19 +8,49 @@ import pandas as pd
 from ultralytics import YOLO
 import tqdm
 import json
+import numpy as np
 
 #custom classes
 from tracker import*
 from counter import Counter, DataWriter
 
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
-configuration_name = 'ultrawide_front_long_1020_500'
+configuration_name = 'ultrawide_rear_1020_500'
 model=YOLO('yolov8s.pt')
+
 
 def RGB(event, x, y, flags, param):
     if event == cv2.EVENT_MOUSEMOVE :  
         colorsBGR = [x, y]
         print(colorsBGR)
+
+
+'''
+    sp and ep define the bounds in the middle. 
+    This is to keep track of all bounding boxes roughly in the center.
+    Starting Point (sp):
+        - Top left coordinate of box
+    Ending Point (ep): 
+        - Bottom right coordinate of the box
+
+'''
+sp = (475, 220)
+ep = (510, 290)
+
+'''
+    inBound -> input is tuple of bounding box & bounds defined earlier
+        - Creates midpoint of bounding box and checks if it is in the bounds
+'''
+def inBound(x3, y3, x4, y4, sp, ep):
+    x_mid = (x3 + x4) // 2
+    y_mid = (y3 + y4) // 2
+
+    if (x_mid >= sp[0] and
+        x_mid <= ep[0] and
+        y_mid >= sp[1] and
+        y_mid <= ep[1]):
+        return True
+    return False
 
 cv2.namedWindow('RGB')
 cv2.setMouseCallback('RGB', RGB)
@@ -73,7 +103,7 @@ class_list = data.split("\n")
 count=0
 #create a new tracker opbject - this keeps track of which objects are actively crossing the lines
 tracker=Tracker()
-
+gid = -1
 #This section holds IDs of cars going into and out of frame on left and right for tracking
 vh_in_left = {}
 vh_out_left = {}
@@ -140,9 +170,42 @@ for _ in tqdm.tqdm(range(vid_length)):
     
     # gets all of the bounding boxes we are tracking    
     bbox_id=tracker.update(list)
+    
+    '''
+    - inside[]: a list that holds all bounding box coordinates in the form of tuples
+    
+    - After iterating through all bounding boxes in the current frame, we choose those that are inBound
+      and add it to inside
+    '''
+    inside = []
+    for bx in bbox_id:
+        (x3,y3,x4,y4,id) = bx
+        x_mid = (x3 + x4) // 2
+        y_mid = (y3 + y4) // 2
+        if (inBound(x3, y3, x4, y4, sp, ep)):
+            inside.append((x3,y3,x4,y4))
+
     for bbox in bbox_id:
         # gets the coordinates of the relevant bounding box
         x3,y3,x4,y4,id=bbox
+
+        # The next 3 lines creates a rectangle to visualize 
+        # color = (255, 0, 0)
+        # thickness = 2
+        # cv2.rectangle(frame, sp, ep, color, thickness)
+        
+        if (len(inside) == 1):
+            cr.update_upper_point(inside[0][3],inside[0][2], 1)
+            cl.update_upper_point(inside[0][3], inside[0][0], 2)    
+        else:
+            cl = Counter(uy1 = l_config['upper_1'][1], uy2 = l_config['upper_2'][1], ux1=l_config['upper_1'][0], ux2=l_config['upper_2'][0],
+            ly1 = l_config['lower_1'][1], ly2 = l_config['lower_2'][1], lx1=l_config['lower_1'][0], lx2=l_config['lower_2'][0],
+            offx=l_config['offx'], offuy=l_config['offuy'], offly=l_config['offly'])
+
+            cr = Counter(uy1 = r_config['upper_1'][1], uy2 = r_config['upper_2'][1], ux1=r_config['upper_1'][0], ux2=r_config['upper_2'][0],
+                ly1 = r_config['lower_1'][1], ly2 = r_config['lower_2'][1], lx1=r_config['lower_1'][0], lx2=r_config['lower_2'][0],
+                offx=r_config['offx'], offuy=r_config['offuy'], offly=r_config['offly'])
+            
         # Gets the midpoint of the x-axis of the bounding box
         center_x=int(x3+x4)//2
         # gets the various y-axis midpoints of bounding boxes used in detection
