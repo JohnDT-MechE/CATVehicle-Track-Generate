@@ -169,7 +169,7 @@ def best_fit(X, Y):
     b = numer / denum
     a = ybar - b * xbar
 
-    print('best fit line:\ny = {:.2f} + {:.2f}x'.format(a, b))
+    print('best fit line:\ny = {:.4f} + {:.4f}x'.format(a, b))
 
     return a, b
 
