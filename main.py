@@ -290,6 +290,7 @@ for _ in tqdm.tqdm(range(vid_length)):
     czone_total = ((len(counter_in_zone1)) + (len(counter_in_zone2)))
     cv2.putText(frame,('In All Zones: ')+str(czone_total),(450,50),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
 
+    # Records Zone Data
     zone_writer.add_event(str(czone1) + ', ' + str(czone2) + ', ' + str(czone_total), start_time + count/framerate)
     
     #gets the number of cars in and out by counting the length of the arrays
