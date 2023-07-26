@@ -1,4 +1,0 @@
-These tests contain the results from running the normal ultrawide and the
-two different acversary perspectives. The time for both the 'trimmed' result
-and the block encoding was calculated using gray code and dividing times by
-two before taking the 5 LSBs.
