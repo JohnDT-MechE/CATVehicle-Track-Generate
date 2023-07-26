@@ -15,7 +15,7 @@ from counter import Counter, DataWriter
 
 # NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
-configuration_name = '1690392140-platoon1-rear'
+configuration_name = '1690393045_platoon3_rear'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):

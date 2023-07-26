@@ -295,5 +295,129 @@
             "x_2": [550, 1020]
         },
         "timestamp": 1690392140
+    }, "1690392480-platoon2-front": {
+        "video_source": "1690392480-platoon2-front.mp4",
+        "video_output": "1690392480-platoon2-front_out.avi",
+        "data_output": "data-files/1690392480-platoon2-front.csv",
+        "data_output_zone": "data-zone/1690392480-platoon2-front_zone.csv",
+        "width": 1020,
+        "height": 500,
+        "left_line": {
+            "upper_1": [135, 315],
+            "upper_2": [450, 335],
+            "lower_1": [10, 325],
+            "lower_2": [440, 345],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "right_line": {
+            "upper_1": [530, 335],
+            "upper_2": [926, 315],
+            "lower_1": [550, 345],
+            "lower_2": [1018, 325],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "zone": {
+            "y": [340, 415],
+            "x_1": [0, 450],
+            "x_2": [520, 1020]
+        },
+        "timestamp": 1690392480
+    }, "1690392483_platoon2_rear": {
+        "video_source": "1690392483_platoon2_rear.mp4",
+        "video_output": "1690392483_platoon2_rear_out.avi",
+        "data_output": "data-files/1690392483_platoon2_rear.csv",
+        "data_output_zone": "data-zone/1690392483_platoon2_rear_zone.csv",
+        "width": 1020,
+        "height": 500,
+        "left_line": {
+            "upper_1": [35, 280],
+            "upper_2": [450, 300],
+            "lower_1": [5, 290],
+            "lower_2": [440, 310],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "right_line": {
+            "upper_1": [540, 300],
+            "upper_2": [926, 280],
+            "lower_1": [550, 310],
+            "lower_2": [1018, 290],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "zone": {
+            "y": [330, 405],
+            "x_1": [0, 460],
+            "x_2": [540, 1020]
+        },
+        "timestamp": 1690392483
+    }, "1690393032_platoon3_front": {
+        "video_source": "1690393032_platoon3_front.mp4",
+        "video_output": "1690393032_platoon3_front_out.avi",
+        "data_output": "data-files/1690393032_platoon3_front.csv",
+        "data_output_zone": "data-zone/1690393032_platoon3_front_zone.csv",
+        "width": 1020,
+        "height": 500,
+        "left_line": {
+            "upper_1": [115, 315],
+            "upper_2": [430, 335],
+            "lower_1": [10, 325],
+            "lower_2": [420, 345],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "right_line": {
+            "upper_1": [520, 335],
+            "upper_2": [926, 315],
+            "lower_1": [530, 345],
+            "lower_2": [1018, 325],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "zone": {
+            "y": [340, 430],
+            "x_1": [0, 430],
+            "x_2": [520, 1020]
+        },
+        "timestamp": 1690393032
+    }, "1690393045_platoon3_rear": {
+        "video_source": "1690393045_platoon3_rear.mp4",
+        "video_output": "1690393045_platoon3_rear_out.avi",
+        "data_output": "data-files/1690393045_platoon3_rear.csv",
+        "data_output_zone": "data-zone/1690393045_platoon3_rear_zone.csv",
+        "width": 1020,
+        "height": 500,
+        "left_line": {
+            "upper_1": [35, 280],
+            "upper_2": [450, 300],
+            "lower_1": [5, 290],
+            "lower_2": [440, 310],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "right_line": {
+            "upper_1": [540, 300],
+            "upper_2": [926, 280],
+            "lower_1": [550, 310],
+            "lower_2": [1018, 290],
+            "offx": 4,
+            "offuy": 5,
+            "offly": 5
+        },
+        "zone": {
+            "y": [330, 405],
+            "x_1": [0, 460],
+            "x_2": [540, 1020]
+        },
+        "timestamp": 1690393045
     }
 }
