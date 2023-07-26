@@ -3,28 +3,30 @@ import numpy as np
 
 class DataWriter:
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, header='time,event'):
         """
         Initialize with a csv file to store the data in
         """
         self.filename = filename
         self.data = []
+        self.header = header
 
-    def add_event(self, event_type, time):
+    def add_event(self, event, time):
         """
-        Gets event type (left_in, left_out, right_in, right_out) and unix time to the nearest 1000th
-        Rounds time to the nearest hundredth of a second and appends a tuple with time and event_type to
+        Gets event (generally assumed to be type (left_in, left_out, right_in, right_out)) and unix time to the nearest 1000th
+        Rounds time to the nearest hundredth of a second and appends a tuple with time and event to
         self.data
         """
         rounded_time = int(time*100) / 100
-        self.data.append((rounded_time, event_type))
+        self.data.append((rounded_time, event))
+
 
     def print(self):
         """
         prints out the data as a somewhat nicely formatted table to the terminal
         """
         #print a header
-        print('time: \t\tEvent Type:')
+        print(self.header)
         #iterate through the entries in self.data
         for event in self.data:
             #for each entry we iterate through, print out a formatted string with the time followed by the event type
@@ -35,7 +37,7 @@ class DataWriter:
         Writes the data in self.data to the csv file specified in filename
         """
         
-        np.savetxt(file if file is not None else self.filename, [row for row in self.data], delimiter=',', fmt='%s', header="time,event", comments="")
+        np.savetxt(file if file is not None else self.filename, [row for row in self.data], delimiter=',', fmt='%s', header=self.header, comments="")
 
     
 

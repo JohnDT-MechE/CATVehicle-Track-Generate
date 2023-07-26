@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 21 July 2023
+# Last updated 24 July 2023
 
 import cv2
 import pandas as pd
@@ -13,8 +13,9 @@ import json
 from tracker import*
 from counter import Counter, DataWriter
 
-# THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT
-configuration_name = 'ultrawide_front_long_1020_500'
+# NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
+# THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
+configuration_name = '1690392140-platoon1-rear'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
@@ -43,6 +44,11 @@ with open("configurations.json") as configuration:
     video_output = config['video_output']
     data_output = config['data_output']
 
+    try:
+        data_output_zone = config['data_output_zone']
+    except:
+        data_output_zone = 'data.csv'
+
     # JSON configurations have two objects, one for the left line locations and offsets, and one for the right line
     l_config = config['left_line']
     r_config = config['right_line']
@@ -54,6 +60,20 @@ with open("configurations.json") as configuration:
     cr = Counter(uy1 = r_config['upper_1'][1], uy2 = r_config['upper_2'][1], ux1=r_config['upper_1'][0], ux2=r_config['upper_2'][0],
                 ly1 = r_config['lower_1'][1], ly2 = r_config['lower_2'][1], lx1=r_config['lower_1'][0], lx2=r_config['lower_2'][0],
                 offx=r_config['offx'], offuy=r_config['offuy'], offly=r_config['offly'])
+    
+
+    # Variables for Zone Counter
+    # CONFIG ZONE LINES HERE
+    zone = config['zone']
+
+    start_area_y = zone['y'][0]
+    end_area_y = zone['y'][1]
+
+    leftx_area1 = zone['x_1'][0]
+    rightx_area1 = zone['x_1'][1]
+
+    leftx_area2 = zone['x_2'][0]
+    rightx_area2 = zone['x_2'][1]
     
 
 cap=cv2.VideoCapture(video_source)
@@ -81,6 +101,10 @@ vh_out_left = {}
 vh_in_right = {}
 vh_out_right = {}
 
+# This holds the IDs of cars that are within the shared "Zone"
+vh_in_zone1 = {}
+vh_in_zone2 = {}
+
 #This section holds IDs of cars that have gone into and out of frame on left and right
 #These are the counters that are updated when a car passes across the lines
 counter_in_left = []
@@ -89,8 +113,15 @@ counter_out_left = []
 counter_in_right = []
 counter_out_right = []
 
+# This is the counter that is updated when a car enters the shared "Zone"
+counter_in_zone1 = []
+counter_in_zone2 = []
+
+
+
 #create a new instance of the datawriter class to record the data we gather
 data_writer = DataWriter(data_output)
+zone_writer = DataWriter(data_output_zone, header='time,left,right,total')
 
 
 #loop through the video
@@ -102,8 +133,8 @@ for _ in tqdm.tqdm(range(vid_length)):
     #this limits the effective framerate of what we are looking at to 10
     if count % (framerate/10) != 0:
         continue
+   
     #resize the frame according to the size specifid in the JSON configuration
-
     frame=cv2.resize(frame,size)
    
     #run YOLOv8 on the frame
@@ -114,6 +145,12 @@ for _ in tqdm.tqdm(range(vid_length)):
     px=pd.DataFrame(a).astype("float")
 
     list=[]
+    
+    # Clears the "Zone" Counter Lists every time a frame is looked at
+    vh_in_zone1.clear()
+    counter_in_zone1.clear()
+    vh_in_zone2.clear()
+    counter_in_zone2.clear()
              
     # Object Tracker
 
@@ -207,9 +244,54 @@ for _ in tqdm.tqdm(range(vid_length)):
                     counter_out_right.append(id)
                     data_writer.add_event('out right', start_time + count/framerate)
                     
+        # Counting Vehicles in Zone 1      
+        if lower_center_y > (start_area_y) and lower_center_y < (end_area_y) and center_x > (leftx_area1) and center_x < (rightx_area1):
+            vh_in_zone1[id] = lower_center_y
+            cv2.circle(frame,(center_x,lower_center_y),4,(0,255,0),-1) # Draw circle
+            cv2.putText(frame,str(id),(center_x,lower_center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+        if id in vh_in_zone1:
+            if id not in counter_in_zone1:
+                counter_in_zone1.append(id)
+                
+        # Counting Vehicles in Zone 2      
+        if lower_center_y > (start_area_y) and lower_center_y < (end_area_y) and center_x > (leftx_area2) and center_x < (rightx_area2):
+            vh_in_zone2[id] = lower_center_y
+            cv2.circle(frame,(center_x,lower_center_y),4,(0,255,0),-1) # Draw circle
+            cv2.putText(frame,str(id),(center_x,lower_center_y),cv2.FONT_HERSHEY_COMPLEX,0.8,(0,255,255),2) # Give and Print ID
+        if id in vh_in_zone2:
+            if id not in counter_in_zone2:
+                counter_in_zone2.append(id)
+                       
+                    
     #this part annotates the lines on the frame
     cl.draw(frame=frame, label_upper='Upper Left', label_lower='Lower Left', color=(0,0,255))
     cr.draw(frame=frame, label_upper='Upper Right', label_lower='Lower Right', color=(255,0,0))
+    
+    # Annotates the lines of the "Zone"
+    cv2.line(frame,(leftx_area1,start_area_y),(rightx_area1,start_area_y),(0,255,0),1) 
+    cv2.putText(frame,('Begin Zone 1'),(10,start_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Top Zone 1
+    
+    cv2.line(frame,(leftx_area1,end_area_y),(rightx_area1,end_area_y),(0,255,0),1) 
+    cv2.putText(frame,('End Zone 1'),(10,end_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Bottom Zone 1
+    
+    cv2.line(frame,(leftx_area2,start_area_y),(rightx_area2,start_area_y),(0,255,0),1) 
+    cv2.putText(frame,('Begin Zone 2'),(850,start_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Top Zone 2
+    
+    cv2.line(frame,(leftx_area2,end_area_y),(rightx_area2,end_area_y),(0,255,0),1) 
+    cv2.putText(frame,('End Zone 2'),(850,end_area_y),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2) # Bottom Zone 2
+    
+    # Processes length of "Zone" Counter and Prints it to screen
+    czone1 = (len(counter_in_zone1))
+    cv2.putText(frame,('In Zone 1: ')+str(czone1),(40,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    
+    czone2 = (len(counter_in_zone2))
+    cv2.putText(frame,('In Zone 2: ')+str(czone2),(840,130),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+    
+    czone_total = ((len(counter_in_zone1)) + (len(counter_in_zone2)))
+    cv2.putText(frame,('In All Zones: ')+str(czone_total),(450,50),cv2.FONT_HERSHEY_COMPLEX_SMALL,0.8,(255,255,255),2)
+
+    # Records Zone Data
+    zone_writer.add_event(str(czone1) + ', ' + str(czone2) + ', ' + str(czone_total), start_time + count/framerate)
     
     #gets the number of cars in and out by counting the length of the arrays
     cin_Left = (len(counter_in_left)) # counter for in left
@@ -236,3 +318,4 @@ out.release()
 cv2.destroyAllWindows()
 
 data_writer.store_data()
+zone_writer.store_data()

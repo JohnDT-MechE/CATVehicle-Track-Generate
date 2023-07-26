@@ -16,7 +16,36 @@ def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
 
     return gray_code[int(t/(1<<bits_to_drop)) % (1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
 
-def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1):
+def encode_zone(filename, start_time, length):
+    """
+    Takes in a file with sequential data about how many vehicles are in a zone at any given time
+    Takes the average number of vehicles over the time period
+    """
+    gray_code = {}
+    for i in range(0, 1<<10):
+        gray=i^(i>>1)
+        gray_code[i] = "{0:0{1}b}".format(gray,5)
+
+    df = pd.read_csv(filename)
+
+    num_frames = 0
+    num_vehicles = 0
+
+    for _, entry in df.iterrows():
+        t = entry.iloc[0]
+        num = entry.iloc[-1]
+
+        if t > start_time and t < start_time + length:
+            num_vehicles += int(num)
+            num_frames += 1
+
+    average_vehicles = num_vehicles/num_frames
+
+    return gray_code[(average_vehicles*10)//1 % 16]
+
+    
+
+def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1, zone_name=None):
     """
     Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
     """
@@ -32,7 +61,11 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
             blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=bits_to_drop))
+    if zone_name is not None:
+        for index in range(len(blocks)):
+            blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size)
 
+    print(blocks)
     return blocks
 
 def filter_timestamps(file1, file2, cutoff, f):
@@ -136,14 +169,14 @@ def best_fit(X, Y):
     b = numer / denum
     a = ybar - b * xbar
 
-    print('best fit line:\ny = {:.2f} + {:.2f}x'.format(a, b))
+    print('best fit line:\ny = {:.4f} + {:.4f}x'.format(a, b))
 
     return a, b
 
 
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
-if __name__ == "__main__":
+def graphs():
 
     rear_left = "data-files/data_adversary_rear_left.csv"
     rear_right = "data-files/data_adversary_rear_right.csv"
@@ -178,12 +211,12 @@ if __name__ == "__main__":
         for res in range(1,8):
             n = length//i
             
-            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1)
-            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1)
-            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1)
-            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1)
-            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1)
-            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1)
+            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name='data-zone/data_adversary_rear_left_zone.csv')
+            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name='data-zone/data_adversary_rear_right_zone.csv')
+            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name='data-zone/data_front_ultrawide_long_zone.csv')
+            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name='data-zone/data_front_ultrawide_long_zone.csv')
+            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name='data-zone/data_front_ultrawide_zone.csv')
+            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name='data-zone/data_rear_ultrawide_zone.csv')
 
             data_normal.append(validate_block(front_block, rear_block))
             data_right.append(validate_block(rear_right_block, front_right_block))
@@ -231,12 +264,12 @@ if __name__ == "__main__":
     for i in range(5, 35):
         n = length//i
         
-        rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
-        rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
-        front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0)
-        front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0)
-        front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0)
-        rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True)
+        rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, zone_name='data-zone/data_adversary_rear_left_zone.csv')
+        rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, zone_name='data-zone/data_adversary_rear_right_zone.csv')
+        front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, zone_name='data-zone/data_front_ultrawide_long_zone.csv')
+        front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, zone_name='data-zone/data_front_ultrawide_long_zone.csv')
+        front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, zone_name='data-zone/data_front_ultrawide_zone.csv')
+        rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, zone_name='data-zone/data_rear_ultrawide_zone.csv')
 
         data_normal.append(validate_block(front_block, rear_block))
         data_right.append(validate_block(rear_right_block, front_right_block))
@@ -279,3 +312,19 @@ if __name__ == "__main__":
     
     
     plt.show()
+
+
+if __name__ == "__main__":
+    #graphs()
+    front_normal = "data-files/data_front_ultrawide.csv"
+    rear_normal = "data-files/data_rear_ultrawide.csv"
+    #front_zone = 'data-zone/data_front_ultrawide_zone.csv'
+    #rear_zone = 'data-zone/data_rear_ultrawide_zone.csv'
+
+    front_zone = None
+    rear_zone = None
+
+    front = block_encoding(front_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, reverse=True, zone_name = front_zone)
+    rear = block_encoding(rear_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = rear_zone)
+
+    print(validate_block(front, rear))
