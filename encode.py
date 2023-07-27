@@ -145,7 +145,7 @@ def validate_block(data1, data2):
         else:
             short = block2
             long = block1
-        if max_len != 0:
+        if len(short) != 0:
             short = short + '0'*(max_len-length)
             accuracy_percent = (max_len - sum([1 if short[index] != long[index] else 0 for index in range(max_len)])) / max_len
             total_accuracy += accuracy_percent
@@ -376,7 +376,7 @@ def graphs_normal_time_resolution_block_size():
 
 
 if __name__ == "__main__":
-    #graphs_old()
+    graphs_old()
     graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
     #rear_normal = "data-files/data_rear_ultrawide.csv"
