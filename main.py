@@ -15,7 +15,7 @@ from counter import Counter, DataWriter
 
 # NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
-configuration_name = 'ultrawide_front_1020_500'
+configuration_name = '1690395530_platoon4_rear'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
@@ -307,6 +307,7 @@ for _ in tqdm.tqdm(range(vid_length)):
     
     #shows the images and writes it to the video writer
     out.write(frame)
+
 
     cv2.imshow("Detecting Vehicles", frame)
     if cv2.waitKey(1)&0xFF==27:

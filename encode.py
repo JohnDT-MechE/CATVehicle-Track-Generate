@@ -43,8 +43,6 @@ def encode_zone(filename, start_time, length):
 
     return gray_code[(average_vehicles*10)//1 % 16]
 
-    
-
 def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1, zone_name=None):
     """
     Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
