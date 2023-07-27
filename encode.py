@@ -376,8 +376,8 @@ def graphs_normal_time_resolution_block_size():
 
 
 if __name__ == "__main__":
-    graphs_old()
-    graphs_normal_time_resolution_block_size()
+    #graphs_old()
+    #graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
     #rear_normal = "data-files/data_rear_ultrawide.csv"
     #front_zone = 'data-zone/data_front_ultrawide_zone.csv'
@@ -390,3 +390,13 @@ if __name__ == "__main__":
     #rear = block_encoding(rear_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = rear_zone)
 
     #print(validate_block(front, rear))
+
+    front_2 = "data-files/1690392480_platoon2_front.csv"
+    rear_2 = "data-files/1690392483_platoon2_rear.csv"
+    front_3 = "data-files/1690393032_platoon3_front.csv"
+    rear_3 = "data-files/1690393045_platoon3_rear.csv"
+
+    with open('filtered_platoon_2.txt', 'w') as f:
+        filter_timestamps(front_2, rear_2, 3, f)
+    with open('filtered_platoon_3.txt', 'w') as f:
+        filter_timestamps(front_3, rear_3, 3, f)
