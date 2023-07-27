@@ -176,7 +176,7 @@ def best_fit(X, Y):
 
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
-def graphs():
+def graphs_old():
 
     rear_left = "data-files/data_adversary_rear_left.csv"
     rear_right = "data-files/data_adversary_rear_right.csv"
@@ -313,18 +313,80 @@ def graphs():
     
     plt.show()
 
+def graphs_normal_time_resolution_block_size():
+
+    front_2 = "data-files/1690392480_platoon2_front.csv"
+    rear_2 = "data-files/1690392483_platoon2_rear.csv"
+    front_3 = "data-files/1690393032_platoon3_front.csv"
+    rear_3 = "data-files/1690393045_platoon3_rear.csv"
+
+    #front_2_zone = "data-zone/1690392480-platoon2-front_zone.csv"
+    #rear_2_zone = "data-zone/1690392483_platoon2_rear_zone.csv"
+    #front_3_zone = "data-zone/1690393032_platoon3_front_zone.csv"
+    #rear_3_zone = "data-zone/1690393045_platoon3_rear_zone.csv"
+
+    front_2_zone = None
+    rear_2_zone = None
+    front_3_zone = None
+    rear_3_zone = None
+
+
+    t2 = 1690392510
+    t3 = 1690393045
+    length = 200
+
+    data = []
+    X = []
+
+    fig, ((ax)) = plt.subplots(1, 1, layout="constrained")
+
+
+    for i in range(5, 36, 10):
+        data = []
+        X = []
+        for res in range(2,8):
+            n = length//i
+            
+            #front_2_block = block_encoding(front_2, t2, block_size=i, num_blocks=n, time_gap=0, reverse=True, tres=res, bits_to_drop=1, zone_name=front_2_zone)
+            #rear_2_block = block_encoding(rear_2, t2, block_size=i, num_blocks=n, time_gap=0, tres=res, bits_to_drop=1, zone_name=rear_2_zone)
+            front_3_block = block_encoding(front_3, t3, block_size=i, num_blocks=n, time_gap=0, tres=res, bits_to_drop=1, zone_name=front_3_zone)
+            rear_3_block = block_encoding(rear_3, t3, block_size=i, num_blocks=n, time_gap=0, reverse=True, tres=res, bits_to_drop=1, zone_name=rear_3_zone)
+            
+            #data.append(validate_block(front_2_block, rear_2_block))  
+            #X.append(res)
+            data.append(validate_block(front_3_block, rear_3_block))  
+            X.append(res)
+
+            
+        ax.scatter(X, data, label=f"Block Size: {i}")
+        a, b = best_fit(X, data)
+        yfit = [a + b * xi for xi in X]
+        ax.plot(X, yfit)
+
+    ax.legend()
+
+        
+    ax.set_xlabel("Time Resolution (bits)")
+    ax.set_ylabel("Percent Similarity")
+
+    fig.suptitle("Percent Similarities with respect to Time Resolution at Various Block Sizes")
+    fig.savefig('figures/Similarity-Block-Length-Platoon-Platoon-3.png', dpi = 300, bbox_inches='tight')
+
+    plt.show()
+
 
 if __name__ == "__main__":
-    #graphs()
-    front_normal = "data-files/data_front_ultrawide.csv"
-    rear_normal = "data-files/data_rear_ultrawide.csv"
+    #graphs_old()
+    graphs_normal_time_resolution_block_size()
+    #front_normal = "data-files/data_front_ultrawide.csv"
+    #rear_normal = "data-files/data_rear_ultrawide.csv"
     #front_zone = 'data-zone/data_front_ultrawide_zone.csv'
     #rear_zone = 'data-zone/data_rear_ultrawide_zone.csv'
 
-    front_zone = None
-    rear_zone = None
+    #front_zone = None
+    #rear_zone = None
 
-    front = block_encoding(front_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, reverse=True, zone_name = front_zone)
-    rear = block_encoding(rear_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = rear_zone)
+    #front = block_encoding(front_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, reverse=True, zone_name = front_zone)
+    #rear = block_encoding(rear_normal, 1689368390, block_size=20, num_blocks=10, time_gap = 0, zone_name = rear_zone)
 
-    print(validate_block(front, rear))
+    #print(validate_block(front, rear))
