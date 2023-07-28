@@ -171,90 +171,103 @@ def best_fit(X, Y):
 
     return a, b
 
-
 #only run this code if we are running the file on its own, otherwise just let whatever code called encode
 #handle the input and output to the function
 def graphs_old():
 
-    rear_left = "data-files/data_adversary_rear_left.csv"
-    rear_right = "data-files/data_adversary_rear_right.csv"
-    front_long = "data-files/data_front_ultrawide_long.csv"
-    front_normal = "data-files/data_front_ultrawide.csv"
-    rear_normal = "data-files/data_rear_ultrawide.csv"
+    rear_left = "data_adversary_rear_left"
+    rear_right = "data_adversary_rear_right"
+    front_long = "data_front_ultrawide_long"
+    front_normal = "data_front_ultrawide"
+    rear_normal = "data_rear_ultrawide"
+
+    platoon_2_front = "1690392480_platoon2_front"
+    platoon_2_rear = "1690392483_platoon2_rear"
+    platoon_3_front = "1690393032_platoon3_front"
+    platoon_3_rear = "1690393045_platoon3_rear"
+
+    adleft_rear_1 = "1690393465_adleft_rear_1"
+    adleft_front_1 = "1690393466_adleft_front_1"
+    adright_rear_1 = "1690394944_adright_rear_1"
+    adright_front_1 = "1690394942_adright_front_1"
 
     trl = 1689369626
     trr = 1689369483
     tnorm = 1689368390
 
-    #time for rear left: 1689369626, 120 seconds long
-    #time for normal ultrawide: 1689368390, 238 seconds long
-    #time for rear right: 1689369483, 117 seconds long
-    length = 120
-
-    data_normal = []
-    data_right = []
-    data_left = []
-    X = []
+    pairs = [(rear_left, front_long, 1689369626, 'l', 120), (rear_right, front_long, 1689369483, 'r', 117),
+             (front_normal, rear_normal, 1689368390, 'n', 238), (platoon_2_front, platoon_2_rear, 1690392500, 'n', 240),
+             (platoon_3_front, platoon_3_rear, 1690393075, 'n', 275), (adleft_rear_1, adleft_front_1, 1690393470, 'l', 210),
+             (adright_rear_1, adright_front_1, 1690394950, 'r', 280)]
 
     fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, layout="constrained")
     fig2, ((bx)) = plt.subplots(1, 1, layout="constrained")
 
-    ax = {5: ax1, 15: ax2, 25: ax3, 35: ax4}
+    ax = {5: ax1, 10: ax2, 15: ax3, 25: ax4}
 
-    for i in [5, 15, 25, 35]:
+
+    for i in [5, 10, 15, 25]:
         data_normal = []
+        X_normal = []
         data_right = []
+        X_right = []
         data_left = []
-        X = []
+        X_left = []
+        data = {'l': data_right, 'r': data_right, 'n': data_normal}
+        X = {'l': X_right, 'r': X_right, 'n': X_normal}
+
         for res in range(1,8):
-            n = length//i
+            for pair in pairs:
+                data_1 = 'data-files/' + pair[0] + '.csv'
+                data_2 = 'data-files/' + pair[1] + '.csv'
+                zone_1 = 'data-zone/' + pair[0] + '_zone.csv'
+                zone_2 = 'data-zone/' + pair[1] + '_zone.csv'
+
+                length = pair[-1]
+                t = pair[2]
             
-            rear_left_block = block_encoding(rear_left, 1689369626, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name='data-zone/data_adversary_rear_left_zone.csv')
-            rear_right_block = block_encoding(rear_right, 1689369483, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name='data-zone/data_adversary_rear_right_zone.csv')
-            front_left_block = block_encoding(front_long, 1689369626, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name='data-zone/data_front_ultrawide_long_zone.csv')
-            front_right_block = block_encoding(front_long, 1689369483, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name='data-zone/data_front_ultrawide_long_zone.csv')
-            front_block = block_encoding(front_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, tres=res, bits_to_drop=1, zone_name='data-zone/data_front_ultrawide_zone.csv')
-            rear_block = block_encoding(rear_normal, 1689368390, block_size=i, num_blocks=n, time_gap = 0, reverse=True, tres=res, bits_to_drop=1, zone_name='data-zone/data_rear_ultrawide_zone.csv')
-
-            data_normal.append(validate_block(front_block, rear_block))
-            data_right.append(validate_block(rear_right_block, front_right_block))
-            data_left.append(validate_block(rear_left_block, front_left_block))
-            X.append(res)
-
-        #print(data_normal)
-        #print(data_right)
-        #print(data_left)
-        #print(X)
-
-        ax[i].set_ylim([0.65, 0.9])
+                n = length//i
+            
+                block_1 = block_encoding(data_1, t, block_size=i, num_blocks=n, time_gap=0, reverse=True,
+                                         tres=res, bits_to_drop=1, zone_name=zone_1)
+                block_2 = block_encoding(data_2, t, block_size=i, num_blocks=n, time_gap=0,
+                                         tres=res, bits_to_drop=1, zone_name=zone_2)
+            
+                data[pair[3]].append(validate_block(block_1, block_2))
+                X[pair[3]].append(res)
+                
+        ax[i].set_ylim([0.55, 0.9])
         ax[i].set_xlim([0.5, 7.5])
         
 
-        ax[i].scatter(X, data_normal)
-        ax[i].scatter(X, data_right)
-        ax[i].scatter(X, data_left)
+        ax[i].scatter(X_normal, data_normal)
+        ax[i].scatter(X_right, data_right)
+        #ax[i].scatter(X_left, data_left)
 
         ax[i].legend(['Normal', 'Adversary Right','Adversary Left'], prop={'size': 6})
+        ax[i].legend(['Normal', 'Adversary'], prop={'size': 6})
 
         #plot the lines of best fit
-        a,b = best_fit(X, data_normal)
-        yfit = [a + b * xi for xi in X]
-        ax[i].plot(X, yfit)
-        a,b = best_fit(X, data_right)
-        yfit = [a + b * xi for xi in X]
-        ax[i].plot(X, yfit)
-        a,b = best_fit(X, data_left)
-        yfit = [a + b * xi for xi in X]
-        ax[i].plot(X, yfit)
+        a,b = best_fit(X_normal, data_normal)
+        yfit = [a + b * xi for xi in X_normal]
+        ax[i].plot(X_normal, yfit)
+        a,b = best_fit(X_right, data_right)
+        yfit = [a + b * xi for xi in X_right]
+        ax[i].plot(X_right, yfit)
+        #a,b = best_fit(X_left, data_left)
+        #yfit = [a + b * xi for xi in X_left]
+        #ax[i].plot(X_left, yfit)
 
         #show the image
-        ax[i].set_xlabel("Time Resolution (bits)")
+        ax[i].set_xlabel("Number of Time Bits Used")
         ax[i].set_ylabel("Percent Similarity")
         ax[i].set_title(f"Block Size of {i}")
 
-    fig1.suptitle("Similarity Percentage with respect to Time Resolution at Various Block Sizes")
-    fig1.savefig('figures/Time-and-Block-Size.png', dpi = 300, bbox_inches='tight')
-
+    
+    fig1.suptitle("Similarity Percentage with respect to Number of Time Bits Used at Various Block Sizes")
+    fig1.savefig('figures/Time-Block-Size-Combined-Adversary.png', dpi = 300, bbox_inches='tight')
+    
+    """
     data_normal = []
     data_right = []
     data_left = []
@@ -306,7 +319,7 @@ def graphs_old():
 
     fig2.suptitle("Similarity Percentage with respect to Block Length")
     fig2.savefig('figures/Similarity-Block-Length.png', dpi = 300, bbox_inches='tight')
-    
+    """
     
     
     plt.show()
@@ -372,9 +385,8 @@ def graphs_normal_time_resolution_block_size():
 
     plt.show()
 
-
 if __name__ == "__main__":
-    #graphs_old()
+    graphs_old()
     #graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
     #rear_normal = "data-files/data_rear_ultrawide.csv"
@@ -389,12 +401,12 @@ if __name__ == "__main__":
 
     #print(validate_block(front, rear))
 
-    front_2 = "data-files/1690392480_platoon2_front.csv"
-    rear_2 = "data-files/1690392483_platoon2_rear.csv"
-    front_3 = "data-files/1690393032_platoon3_front.csv"
-    rear_3 = "data-files/1690393045_platoon3_rear.csv"
+    #front_2 = "data-files/1690392480_platoon2_front.csv"
+    #rear_2 = "data-files/1690392483_platoon2_rear.csv"
+    #front_3 = "data-files/1690393032_platoon3_front.csv"
+    #rear_3 = "data-files/1690393045_platoon3_rear.csv"
 
-    with open('filtered_platoon_2.txt', 'w') as f:
-        filter_timestamps(front_2, rear_2, 3, f)
-    with open('filtered_platoon_3.txt', 'w') as f:
-        filter_timestamps(front_3, rear_3, 3, f)
+    #with open('filtered_platoon_2.txt', 'w') as f:
+    #    filter_timestamps(front_2, rear_2, 3, f)
+    #with open('filtered_platoon_3.txt', 'w') as f:
+    #    filter_timestamps(front_3, rear_3, 3, f)
