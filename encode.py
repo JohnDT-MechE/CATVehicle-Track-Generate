@@ -124,7 +124,6 @@ def filter_timestamps(file1, file2, cutoff, f):
     
     f.write('\n' + str((len(data_string1) - sum([1 if data_string1[index] != data_string2[index] else 0 for index in range(len(data_string1))])) / len(data_string1)))
 
-
 def validate_block(data1, data2):
     """
     Takes in two lists encoded in blocks, and compares the average accuracy
@@ -172,8 +171,6 @@ def best_fit(X, Y):
 
     return a, b
 
-#only run this code if we are running the file on its own, otherwise just let whatever code called encode
-#handle the input and output to the function
 def graphs_old():
 
     rear_left = "data_adversary_rear_left"
@@ -352,7 +349,6 @@ def graph_block_size():
     fig1.suptitle("Similarity Percentage of Zones with respect to Block Length")
     fig1.savefig('figures/Similarity-Zones-Block-Length.png', dpi = 300, bbox_inches='tight')
     
-
 def graphs_normal_time_resolution_block_size():
 
     front_2 = "data-files/1690392480_platoon2_front.csv"
