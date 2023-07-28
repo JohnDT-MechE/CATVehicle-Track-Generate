@@ -229,9 +229,9 @@ def graphs_old():
                 n = length//i
             
                 block_1 = block_encoding(data_1, t, block_size=i, num_blocks=n, time_gap=0, reverse=True,
-                                         tres=res, bits_to_drop=1, zone_name=zone_1)
+                                         tres=res, bits_to_drop=1, zone_name=None)
                 block_2 = block_encoding(data_2, t, block_size=i, num_blocks=n, time_gap=0,
-                                         tres=res, bits_to_drop=1, zone_name=zone_2)
+                                         tres=res, bits_to_drop=1, zone_name=None)
             
                 data[pair[3]].append(validate_block(block_1, block_2))
                 X[pair[3]].append(res)
@@ -264,8 +264,8 @@ def graphs_old():
         ax[i].set_title(f"Block Size of {i}")
 
     
-    fig1.suptitle("Similarity Percentage with respect to Number of Time Bits Used at Various Block Sizes")
-    fig1.savefig('figures/Time-Block-Size-Combined-Adversary.png', dpi = 300, bbox_inches='tight')
+    fig1.suptitle("Similarity versus Time Resolution and Block Size without Zones")
+    fig1.savefig('figures/Time-Block-Size-No-Zone.png', dpi = 300, bbox_inches='tight')
     
     """
     data_normal = []
