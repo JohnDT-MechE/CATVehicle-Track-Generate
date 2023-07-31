@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 
 def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
     """
@@ -50,7 +51,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
     df = pd.read_csv(filename)
 
     blocks = ['' for _ in range(num_blocks)]
-    """
+    
     for _, entry in df.iterrows():
         t = entry.iloc[0]
         e = entry.iloc[1]
@@ -59,11 +60,11 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
             blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=bits_to_drop))
-    """
+    
     if zone_name is not None:
         for index in range(len(blocks)):
             blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size)
-
+    
     print(blocks)
     return blocks
 
@@ -266,6 +267,20 @@ def graphs_old():
     plt.show()
 
 def graph_block_size():
+
+    
+    SMALL_SIZE = 12
+    MEDIUM_SIZE = 14
+    BIGGER_SIZE = 16
+
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
     fig1, ((bx)) = plt.subplots(1, 1, layout="constrained")
 
 
@@ -299,7 +314,17 @@ def graph_block_size():
     X_left = []
     X = {'l': X_left, 'r': X_right, 'n': X_normal}
     
-    for i in range(5, 35):
+    for i in range(5, 36, 2):
+        
+        temp_data_norm = [0]
+        num_norm = [0]
+        temp_data_right = [0]
+        num_right = [0]
+        temp_data_left = [0]
+        num_left = [0]
+        data = {'l': temp_data_left, 'r': temp_data_right, 'n': temp_data_norm}
+        X = {'l': num_left, 'r': num_right, 'n': num_norm}
+        
         for pair in pairs:
             data_1 = 'data-files/' + pair[0] + '.csv'
             data_2 = 'data-files/' + pair[1] + '.csv'
@@ -316,13 +341,20 @@ def graph_block_size():
             block_2 = block_encoding(data_2, t, block_size=i, num_blocks=n, time_gap=0,
                                         tres=4, bits_to_drop=1, zone_name=zone_2)
         
-            data[pair[3]].append(validate_block(block_1, block_2))
-            X[pair[3]].append(i)
+            #data[pair[3]].append(validate_block(block_1, block_2))
+            #X[pair[3]].append(i)
+            data[pair[3]][0] += validate_block(block_1, block_2)
+            X[pair[3]][0] += 1
 
-    #print(data_normal)
-    #print(data_right)
-    #print(data_left)
-    #print(X)
+        
+        
+        data_normal.append(temp_data_norm[0]/num_norm[0])
+        X_normal.append(i)
+        data_left.append(temp_data_left[0]/num_left[0])
+        X_left.append(i)
+        data_right.append(temp_data_right[0]/num_right[0])
+        X_right.append(i)
+        
     
 
     bx.scatter(X_normal, data_normal)
@@ -330,7 +362,8 @@ def graph_block_size():
     bx.scatter(X_left, data_left)
 
     bx.legend(['Normal', 'Adversary Right','Adversary Left'])
-
+    #bx.legend(['Normal', 'Adversary'])
+    
     #plot the lines of best fit
     a,b = best_fit(X_normal, data_normal)
     yfit = [a + b * xi for xi in X_normal]
@@ -341,13 +374,13 @@ def graph_block_size():
     a,b = best_fit(X_left, data_left)
     yfit = [a + b * xi for xi in X_left]
     bx.plot(X_left, yfit)
+    
 
-    #show the image
+    
     bx.set_xlabel("Block Length (seconds)")
     bx.set_ylabel("Percent Similarity")
 
-    fig1.suptitle("Similarity Percentage of Zones with respect to Block Length")
-    fig1.savefig('figures/Similarity-Zones-Block-Length.png', dpi = 300, bbox_inches='tight')
+    fig1.savefig('figures/Block-Length-Both-Scatter-Averaged.png', dpi = 300, bbox_inches='tight')
     
 def graphs_normal_time_resolution_block_size():
 
