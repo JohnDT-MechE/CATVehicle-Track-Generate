@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 24 July 2023
+# Last updated 28 July 2023
 
 import cv2
 import pandas as pd
