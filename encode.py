@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+import math
 
 def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
     """
@@ -17,7 +18,7 @@ def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
 
     return gray_code[int(t/(1<<bits_to_drop)) % (1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
 
-def encode_zone(filename, start_time, length, zone_multiplier):
+def encode_zone(filename, start_time, length, zone_multiplier=10):
     """
     Takes in a file with sequential data about how many vehicles are in a zone at any given time
     Takes the average number of vehicles over the time period
@@ -31,7 +32,7 @@ def encode_zone(filename, start_time, length, zone_multiplier):
 
     num_frames = 0
     num_vehicles = 0
-
+    
     for _, entry in df.iterrows():
         t = entry.iloc[0]
         num = entry.iloc[-1]
@@ -42,8 +43,11 @@ def encode_zone(filename, start_time, length, zone_multiplier):
 
     average_vehicles = num_vehicles/num_frames
 
+    power_of_two = 2**int(math.log(zone_multiplier, 2)+2)
+    #power_of_two = 16
+
     #print(average_vehicles)
-    return gray_code[(average_vehicles*zone_multiplier)//1 % 16]
+    return gray_code[(average_vehicles*zone_multiplier)//1 % power_of_two]
 
 def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1, zone_name=None, zone_multiplier=10):
     """
@@ -52,7 +56,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
     df = pd.read_csv(filename)
 
     blocks = ['' for _ in range(num_blocks)]
-    """
+    
     for _, entry in df.iterrows():
         t = entry.iloc[0]
         e = entry.iloc[1]
@@ -61,10 +65,10 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
             blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=bits_to_drop))
-    """
+    
     if zone_name is not None:
         for index in range(len(blocks)):
-            blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size, zone_multiplier)
+            blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size, zone_multiplier=zone_multiplier)
     
     print(blocks)
     return blocks
@@ -419,7 +423,8 @@ def graph_block_size():
     bx.set_xlabel("Block Length (seconds)")
     bx.set_ylabel("Percent Similarity")
 
-    fig1.savefig('figures/Block-Length-Both-Scatter-Averaged.png', dpi = 300, bbox_inches='tight')
+    fig1.savefig('figures/Block-Length-Events-Scatter-Averaged.png', dpi = 300, bbox_inches='tight')
+    plt.show()
     
 def graphs_normal_time_resolution_block_size():
 
@@ -530,7 +535,7 @@ def graphs_zone_parameters():
     X_left = []
     X = {'l': X_left, 'r': X_right, 'n': X_normal}
     
-    for i in range(4, 133, 16):
+    for i in range(5, 36, 5):
         
         temp_data_norm = [0]
         num_norm = [0]
@@ -550,12 +555,13 @@ def graphs_zone_parameters():
             length = pair[-1]
             t = pair[2]
         
-            #Use a block size of fifteen because that is relatively neutral
-            n = length//15
+            #Use a block size of ten because that is relatively neutral
+            n = length//10
+            print(n)
         
-            block_1 = block_encoding(data_1, t, block_size=i, num_blocks=n, time_gap=0, reverse=True,
+            block_1 = block_encoding(data_1, t, block_size=10, num_blocks=n, time_gap=0, reverse=True,
                                         tres=4, bits_to_drop=1, zone_name=zone_1, zone_multiplier=i)
-            block_2 = block_encoding(data_2, t, block_size=i, num_blocks=n, time_gap=0,
+            block_2 = block_encoding(data_2, t, block_size=10, num_blocks=n, time_gap=0,
                                         tres=4, bits_to_drop=1, zone_name=zone_2, zone_multiplier=i)
         
             #data[pair[3]].append(validate_block(block_1, block_2))
@@ -574,9 +580,9 @@ def graphs_zone_parameters():
         
     
 
-    bx.scatter(X_normal, data_normal)
-    bx.scatter(X_right, data_right)
-    bx.scatter(X_left, data_left)
+    bx.scatter(X_normal, data_normal, color="#56b4e9")
+    bx.scatter(X_right, data_right, color="#009e73")
+    bx.scatter(X_left, data_left, color="#d55e00")
 
     bx.legend(['Normal', 'Adversary Right','Adversary Left'])
     #bx.legend(['Normal', 'Adversary'])
@@ -584,13 +590,13 @@ def graphs_zone_parameters():
     #plot the lines of best fit
     a,b = best_fit(X_normal, data_normal)
     yfit = [a + b * xi for xi in X_normal]
-    bx.plot(X_normal, yfit)
+    bx.plot(X_normal, yfit, color="#56b4e9")
     a,b = best_fit(X_right, data_right)
     yfit = [a + b * xi for xi in X_right]
-    bx.plot(X_right, yfit)
+    bx.plot(X_right, yfit, color="#009e73")
     a,b = best_fit(X_left, data_left)
     yfit = [a + b * xi for xi in X_left]
-    bx.plot(X_left, yfit)
+    bx.plot(X_left, yfit, color="#d55e00")
     
 
     
@@ -600,8 +606,8 @@ def graphs_zone_parameters():
     fig1.savefig('figures/Zone-Multiplier-16b.png', dpi = 300, bbox_inches='tight')
 
 if __name__ == "__main__":
-    graphs_zone_parameters()
-    #graphs_old()
+    #graphs_zone_parameters()
+    graphs_old()
     #graph_block_size()
     #graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
