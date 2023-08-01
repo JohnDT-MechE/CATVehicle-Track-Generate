@@ -17,7 +17,7 @@ def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
 
     return gray_code[int(t/(1<<bits_to_drop)) % (1<<time_resolution)] + (normal_map[e] if not reverse else reverse_map[e])
 
-def encode_zone(filename, start_time, length):
+def encode_zone(filename, start_time, length, zone_multiplier):
     """
     Takes in a file with sequential data about how many vehicles are in a zone at any given time
     Takes the average number of vehicles over the time period
@@ -42,16 +42,17 @@ def encode_zone(filename, start_time, length):
 
     average_vehicles = num_vehicles/num_frames
 
-    return gray_code[(average_vehicles*10)//1 % 16]
+    #print(average_vehicles)
+    return gray_code[(average_vehicles*zone_multiplier)//1 % 16]
 
-def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1, zone_name=None):
+def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, reverse=False, tres=4, bits_to_drop=1, zone_name=None, zone_multiplier=10):
     """
     Ecodes data from a csv into a list of encoded 'blocks', each containing all the events that occurred within a given time
     """
     df = pd.read_csv(filename)
 
     blocks = ['' for _ in range(num_blocks)]
-    
+    """
     for _, entry in df.iterrows():
         t = entry.iloc[0]
         e = entry.iloc[1]
@@ -60,10 +61,10 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
             blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=bits_to_drop))
-    
+    """
     if zone_name is not None:
         for index in range(len(blocks)):
-            blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size)
+            blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size, zone_multiplier)
     
     print(blocks)
     return blocks
@@ -274,12 +275,13 @@ def graphs_old():
         ax[i].set_xlim([0.5, 7.5])
         
 
-        ax[i].scatter(X_normal, data_normal)
-        ax[i].scatter(X_right, data_right)
-        ax[i].scatter(X_left, data_left)
+        ax[i].plot(X_normal, data_normal, color='#d55e00')
+        ax[i].plot(X_right, data_right, color='#f0e442')
+        ax[i].plot(X_left, data_left, color='#0072b2')
 
-        ax[i].legend(['Normal', 'Adversary Right','Adversary Left'], prop={'size': 6})
+        ax[i].legend(['Normal', 'Adversary Right','Adversary Left'], prop={'size': 12})
 
+        """
         #plot the lines of best fit
         a,b = best_fit(X_normal, data_normal)
         yfit = [a + b * xi for xi in X_normal]
@@ -290,11 +292,12 @@ def graphs_old():
         a,b = best_fit(X_left, data_left)
         yfit = [a + b * xi for xi in X_left]
         ax[i].plot(X_left, yfit)
+        """
 
         #show the image
         ax[i].set_xlabel("Number of Time Bits Used")
         ax[i].set_ylabel("Percent Similarity")
-        ax[i].set_title(f"Block Size of {i}")
+        #ax[i].set_title(f"Block Size of {i}")
 
     fig1.savefig('figures/Time-Block-All-1.png', dpi = 300, bbox_inches='tight')
     fig2.savefig('figures/Time-Block-All-2.png', dpi = 300, bbox_inches='tight')
@@ -479,8 +482,126 @@ def graphs_normal_time_resolution_block_size():
 
     plt.show()
 
+def graphs_zone_parameters():
+
+    
+    SMALL_SIZE = 12
+    MEDIUM_SIZE = 14
+    BIGGER_SIZE = 16
+
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+    fig1, ((bx)) = plt.subplots(1, 1, layout="constrained")
+
+
+    rear_left = "data_adversary_rear_left"
+    rear_right = "data_adversary_rear_right"
+    front_long = "data_front_ultrawide_long"
+    front_normal = "data_front_ultrawide"
+    rear_normal = "data_rear_ultrawide"
+
+    platoon_2_front = "1690392480_platoon2_front"
+    platoon_2_rear = "1690392483_platoon2_rear"
+    platoon_3_front = "1690393032_platoon3_front"
+    platoon_3_rear = "1690393045_platoon3_rear"
+
+    adleft_rear_1 = "1690393465_adleft_rear_1"
+    adleft_front_1 = "1690393466_adleft_front_1"
+    adright_rear_1 = "1690394944_adright_rear_1"
+    adright_front_1 = "1690394942_adright_front_1"
+
+    pairs = [(rear_left, front_long, 1689369626, 'l', 120), (rear_right, front_long, 1689369483, 'r', 117),
+             (front_normal, rear_normal, 1689368390, 'n', 238), (platoon_2_front, platoon_2_rear, 1690392500, 'n', 240),
+             (platoon_3_front, platoon_3_rear, 1690393075, 'n', 275), (adleft_rear_1, adleft_front_1, 1690393470, 'l', 210),
+             (adright_rear_1, adright_front_1, 1690394950, 'r', 280)]
+    
+    data_normal = []
+    data_right = []
+    data_left = []
+    data = {'l': data_left, 'r': data_right, 'n': data_normal}
+    X_normal = []
+    X_right = []
+    X_left = []
+    X = {'l': X_left, 'r': X_right, 'n': X_normal}
+    
+    for i in range(4, 133, 16):
+        
+        temp_data_norm = [0]
+        num_norm = [0]
+        temp_data_right = [0]
+        num_right = [0]
+        temp_data_left = [0]
+        num_left = [0]
+        data = {'l': temp_data_left, 'r': temp_data_right, 'n': temp_data_norm}
+        X = {'l': num_left, 'r': num_right, 'n': num_norm}
+        
+        for pair in pairs:
+            data_1 = 'data-files/' + pair[0] + '.csv'
+            data_2 = 'data-files/' + pair[1] + '.csv'
+            zone_1 = 'data-zone/' + pair[0] + '_zone.csv'
+            zone_2 = 'data-zone/' + pair[1] + '_zone.csv'
+
+            length = pair[-1]
+            t = pair[2]
+        
+            #Use a block size of fifteen because that is relatively neutral
+            n = length//15
+        
+            block_1 = block_encoding(data_1, t, block_size=i, num_blocks=n, time_gap=0, reverse=True,
+                                        tres=4, bits_to_drop=1, zone_name=zone_1, zone_multiplier=i)
+            block_2 = block_encoding(data_2, t, block_size=i, num_blocks=n, time_gap=0,
+                                        tres=4, bits_to_drop=1, zone_name=zone_2, zone_multiplier=i)
+        
+            #data[pair[3]].append(validate_block(block_1, block_2))
+            #X[pair[3]].append(i)
+            data[pair[3]][0] += validate_block(block_1, block_2)
+            X[pair[3]][0] += 1
+
+        
+        
+        data_normal.append(temp_data_norm[0]/num_norm[0])
+        X_normal.append(i)
+        data_left.append(temp_data_left[0]/num_left[0])
+        X_left.append(i)
+        data_right.append(temp_data_right[0]/num_right[0])
+        X_right.append(i)
+        
+    
+
+    bx.scatter(X_normal, data_normal)
+    bx.scatter(X_right, data_right)
+    bx.scatter(X_left, data_left)
+
+    bx.legend(['Normal', 'Adversary Right','Adversary Left'])
+    #bx.legend(['Normal', 'Adversary'])
+    
+    #plot the lines of best fit
+    a,b = best_fit(X_normal, data_normal)
+    yfit = [a + b * xi for xi in X_normal]
+    bx.plot(X_normal, yfit)
+    a,b = best_fit(X_right, data_right)
+    yfit = [a + b * xi for xi in X_right]
+    bx.plot(X_right, yfit)
+    a,b = best_fit(X_left, data_left)
+    yfit = [a + b * xi for xi in X_left]
+    bx.plot(X_left, yfit)
+    
+
+    
+    bx.set_xlabel("Zone Multiplier")
+    bx.set_ylabel("Percent Similarity")
+
+    fig1.savefig('figures/Zone-Multiplier-16b.png', dpi = 300, bbox_inches='tight')
+
 if __name__ == "__main__":
-    graphs_old()
+    graphs_zone_parameters()
+    #graphs_old()
     #graph_block_size()
     #graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
