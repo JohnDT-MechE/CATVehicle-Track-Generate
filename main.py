@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
 # Altered by Adhith, John, and Max
-# Last updated 28 July 2023
+# Last updated 31 July 2023
 
 import cv2
 import pandas as pd
@@ -188,6 +188,8 @@ for _ in tqdm.tqdm(range(vid_length)):
         upper_center_y=y3
         lower_quarter_center_y=int((y3*0.25)+(y4*0.75))
         
+        
+        ## ACTIVE EVENT SYSTEM ##
         # LEFT SIDE
         # Counting vehicles going "inLeft" to frame
         #check if the object we are currently checking is within the offset of the upper line
@@ -243,7 +245,10 @@ for _ in tqdm.tqdm(range(vid_length)):
                 if id not in counter_out_right:
                     counter_out_right.append(id)
                     data_writer.add_event('out right', start_time + count/framerate)
-                    
+        
+        
+        ## PASSIVE EVENT SYSTEM ##
+        # LEFT SIDE
         # Counting Vehicles in Zone 1      
         if lower_center_y > (start_area_y) and lower_center_y < (end_area_y) and center_x > (leftx_area1) and center_x < (rightx_area1):
             vh_in_zone1[id] = lower_center_y
@@ -253,6 +258,8 @@ for _ in tqdm.tqdm(range(vid_length)):
             if id not in counter_in_zone1:
                 counter_in_zone1.append(id)
                 
+                
+        # RIGHT SIDE       
         # Counting Vehicles in Zone 2      
         if lower_center_y > (start_area_y) and lower_center_y < (end_area_y) and center_x > (leftx_area2) and center_x < (rightx_area2):
             vh_in_zone2[id] = lower_center_y
