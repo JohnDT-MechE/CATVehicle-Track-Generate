@@ -174,6 +174,18 @@ def best_fit(X, Y):
 
 def graphs_old():
 
+    SMALL_SIZE = 12
+    MEDIUM_SIZE = 14
+    BIGGER_SIZE = 16
+
+    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
     rear_left = "data_adversary_rear_left"
     rear_right = "data_adversary_rear_right"
     front_long = "data_front_ultrawide_long"
@@ -199,7 +211,11 @@ def graphs_old():
              (platoon_3_front, platoon_3_rear, 1690393075, 'n', 275), (adleft_rear_1, adleft_front_1, 1690393470, 'l', 210),
              (adright_rear_1, adright_front_1, 1690394950, 'r', 280)]
 
-    fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, layout="constrained")
+    #fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, layout="constrained")
+    fig1, ((ax1)) = plt.subplots(1,1, layout="constrained")
+    fig2, ((ax2)) = plt.subplots(1,1, layout="constrained")
+    fig3, ((ax3)) = plt.subplots(1,1, layout="constrained")
+    fig4, ((ax4)) = plt.subplots(1,1, layout="constrained")
     #fig2, ((bx)) = plt.subplots(1, 1, layout="constrained")
 
     ax = {5: ax1, 10: ax2, 15: ax3, 25: ax4}
@@ -212,11 +228,21 @@ def graphs_old():
         X_right = []
         data_left = []
         X_left = []
-        data = {'l': data_left, 'r': data_right, 'n': data_normal}
-        X = {'l': X_left, 'r': X_right, 'n': X_normal}
+        #data = {'l': data_left, 'r': data_right, 'n': data_normal}
+        #X = {'l': X_left, 'r': X_right, 'n': X_normal}
 
         for res in range(1,8):
+            temp_data_norm = [0]
+            num_norm = [0]
+            temp_data_right = [0]
+            num_right = [0]
+            temp_data_left = [0]
+            num_left = [0]
+            data = {'l': temp_data_left, 'r': temp_data_right, 'n': temp_data_norm}
+            X = {'l': num_left, 'r': num_right, 'n': num_norm}
             for pair in pairs:
+                
+
                 data_1 = 'data-files/' + pair[0] + '.csv'
                 data_2 = 'data-files/' + pair[1] + '.csv'
                 zone_1 = 'data-zone/' + pair[0] + '_zone.csv'
@@ -232,8 +258,17 @@ def graphs_old():
                 block_2 = block_encoding(data_2, t, block_size=i, num_blocks=n, time_gap=0,
                                          tres=res, bits_to_drop=1, zone_name=zone_2)
             
-                data[pair[3]].append(validate_block(block_1, block_2))
-                X[pair[3]].append(res)
+                #data[pair[3]].append(validate_block(block_1, block_2))
+                #X[pair[3]].append(res)
+                data[pair[3]][0] += validate_block(block_1, block_2)
+                X[pair[3]][0] += 1
+
+            data_normal.append(temp_data_norm[0]/num_norm[0])
+            X_normal.append(res)
+            data_left.append(temp_data_left[0]/num_left[0])
+            X_left.append(res)
+            data_right.append(temp_data_right[0]/num_right[0])
+            X_right.append(res)
                 
         ax[i].set_ylim([0.55, 0.9])
         ax[i].set_xlim([0.5, 7.5])
@@ -261,9 +296,10 @@ def graphs_old():
         ax[i].set_ylabel("Percent Similarity")
         ax[i].set_title(f"Block Size of {i}")
 
-    
-    fig1.suptitle("Zone Similarity versus Time Resolution and Block Size")
-    fig1.savefig('figures/Time-Block-Only-Zone.png', dpi = 300, bbox_inches='tight')
+    fig1.savefig('figures/Time-Block-All-1.png', dpi = 300, bbox_inches='tight')
+    fig2.savefig('figures/Time-Block-All-2.png', dpi = 300, bbox_inches='tight')
+    fig3.savefig('figures/Time-Block-All-3.png', dpi = 300, bbox_inches='tight')
+    fig4.savefig('figures/Time-Block-All-4.png', dpi = 300, bbox_inches='tight')
     plt.show()
 
 def graph_block_size():
@@ -444,8 +480,8 @@ def graphs_normal_time_resolution_block_size():
     plt.show()
 
 if __name__ == "__main__":
-    #graphs_old()
-    graph_block_size()
+    graphs_old()
+    #graph_block_size()
     #graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
     #rear_normal = "data-files/data_rear_ultrawide.csv"
