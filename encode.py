@@ -56,7 +56,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
     df = pd.read_csv(filename)
 
     blocks = ['' for _ in range(num_blocks)]
-    
+    """
     for _, entry in df.iterrows():
         t = entry.iloc[0]
         e = entry.iloc[1]
@@ -65,7 +65,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
             blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=bits_to_drop))
-    
+    """
     if zone_name is not None:
         for index in range(len(blocks)):
             blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size, zone_multiplier=zone_multiplier)
@@ -180,15 +180,15 @@ def best_fit(X, Y):
 def graphs_old():
 
     SMALL_SIZE = 12
-    MEDIUM_SIZE = 14
-    BIGGER_SIZE = 16
+    MEDIUM_SIZE = 16
+    BIGGER_SIZE = 18
 
-    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
-    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
     plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
-    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
     plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
     rear_left = "data_adversary_rear_left"
@@ -283,7 +283,7 @@ def graphs_old():
         ax[i].plot(X_right, data_right, color='#f0e442')
         ax[i].plot(X_left, data_left, color='#0072b2')
 
-        ax[i].legend(['Normal', 'Adversary Right','Adversary Left'], prop={'size': 12})
+        ax[i].legend(['Normal', 'Adversary Right','Adversary Left'], prop={'size': 14})
 
         """
         #plot the lines of best fit
@@ -313,15 +313,15 @@ def graph_block_size():
 
     
     SMALL_SIZE = 12
-    MEDIUM_SIZE = 14
-    BIGGER_SIZE = 16
+    MEDIUM_SIZE = 16
+    BIGGER_SIZE = 18
 
-    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
-    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
     plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
-    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
     plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
     fig1, ((bx)) = plt.subplots(1, 1, layout="constrained")
@@ -423,7 +423,7 @@ def graph_block_size():
     bx.set_xlabel("Block Length (seconds)")
     bx.set_ylabel("Percent Similarity")
 
-    fig1.savefig('figures/Block-Length-Events-Scatter-Averaged.png', dpi = 300, bbox_inches='tight')
+    fig1.savefig('figures/Block-Length-Zones-Scatter-Averaged.png', dpi = 300, bbox_inches='tight')
     plt.show()
     
 def graphs_normal_time_resolution_block_size():
@@ -491,15 +491,15 @@ def graphs_zone_parameters():
 
     
     SMALL_SIZE = 12
-    MEDIUM_SIZE = 14
-    BIGGER_SIZE = 16
+    MEDIUM_SIZE = 16
+    BIGGER_SIZE = 18
 
-    plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
-    plt.rc('axes', titlesize=SMALL_SIZE)     # fontsize of the axes title
+    plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
     plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
-    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
-    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
     plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
     fig1, ((bx)) = plt.subplots(1, 1, layout="constrained")
@@ -606,8 +606,8 @@ def graphs_zone_parameters():
     fig1.savefig('figures/Zone-Multiplier-16b.png', dpi = 300, bbox_inches='tight')
 
 if __name__ == "__main__":
-    #graphs_zone_parameters()
-    graphs_old()
+    graphs_zone_parameters()
+    #graphs_old()
     #graph_block_size()
     #graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
