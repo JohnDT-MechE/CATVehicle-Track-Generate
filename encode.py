@@ -56,7 +56,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
     df = pd.read_csv(filename)
 
     blocks = ['' for _ in range(num_blocks)]
-    """
+    
     for _, entry in df.iterrows():
         t = entry.iloc[0]
         e = entry.iloc[1]
@@ -65,7 +65,7 @@ def block_encoding(filename, start_time, block_size, num_blocks, time_gap=0, rev
 
         if block >= 0 and block < num_blocks and (t - start_time - block*(block_size+time_gap)) <= block_size:
             blocks[block] += (encode_event(t, e, reverse, time_resolution=tres, bits_to_drop=bits_to_drop))
-    """
+    
     if zone_name is not None:
         for index in range(len(blocks)):
             blocks[index] += encode_zone(zone_name, start_time + index*block_size, block_size, zone_multiplier=zone_multiplier)
@@ -299,7 +299,7 @@ def graphs_old():
         """
 
         #show the image
-        ax[i].set_xlabel("Number of Time Bits Used")
+        ax[i].set_xlabel("Bits used from Timestamp")
         ax[i].set_ylabel("Percent Similarity")
         #ax[i].set_title(f"Block Size of {i}")
 
@@ -606,8 +606,8 @@ def graphs_zone_parameters():
     fig1.savefig('figures/Zone-Multiplier-16b.png', dpi = 300, bbox_inches='tight')
 
 if __name__ == "__main__":
-    graphs_zone_parameters()
-    #graphs_old()
+    #graphs_zone_parameters()
+    graphs_old()
     #graph_block_size()
     #graphs_normal_time_resolution_block_size()
     #front_normal = "data-files/data_front_ultrawide.csv"
