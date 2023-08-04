@@ -1,7 +1,7 @@
 # Tracking and Counting
 # Being used by CAT Vehicle Group 2
-# Altered by Adhith, John, and Max
-# Last updated 31 July 2023
+# Written by John, Max, and Adhith
+# Last updated 3 August 2023
 
 import cv2
 import pandas as pd
@@ -15,7 +15,7 @@ from counter import Counter, DataWriter
 
 # NEED TO ALTER CONFIGURATION OF "ZONE" COUNTER IN THIS DOCUMENT -- ONLY LOCATION THOUGH
 # THIS IS THE ONLY CONFIGURATION THAT NEEDS TO BE CHANGED IN THIS DOCUMENT FOR VEHICLE PASSING COUNTER
-configuration_name = '1690393466_adleft_front_1'
+configuration_name = 'ultrawide_front_long_1020_500'
 model=YOLO('yolov8s.pt')
 
 def RGB(event, x, y, flags, param):
