@@ -4,6 +4,22 @@ import matplotlib.pyplot as plt
 import matplotlib
 import math
 
+def events_per_second(filenames):
+    events_total = 0
+    time_total = 0
+    for file in filenames:
+        df = pd.read_csv(file)
+
+        start_time = df.iloc[0,0]
+        end_time = df.iloc[-1,0]
+
+        length = end_time - start_time
+        time_total += length
+
+        events_total += df.shape[0]
+
+    return events_total / time_total
+
 def encode_event(t, e, reverse=False, time_resolution=4, bits_to_drop=1):
     """
     Encodes a single event event, adding it to data
@@ -605,11 +621,75 @@ def graphs_zone_parameters():
 
     fig1.savefig('figures/Zone-Multiplier-16b.png', dpi = 300, bbox_inches='tight')
 
+def graphs_bps():
+    files = ["data-files/1690392480_platoon2_front.csv", "data-files/1690392483_platoon2_rear.csv", "data-files/1690393032_platoon3_front.csv",
+             "data-files/1690393045_platoon3_rear.csv", "data-files/1690393465_adleft_rear_1.csv", "data-files/1690393466_adleft_front_1.csv",
+             "data-files/1690394942_adright_front_1.csv", "data-files/1690394944_adright_rear_1.csv", "data-files/1690395529_platoon4_front.csv",
+             "data-files/1690395530_platoon4_rear.csv", "data-files/data_adversary_rear_left.csv", "data-files/data_adversary_rear_right.csv",
+             "data-files/data_front_ultrawide_long.csv", "data-files/data_front_ultrawide.csv","data-files/data_rear_ultrawide.csv"]
+    #get the number of events per second
+    events = events_per_second(files)
+    print(events)
+
+    MEDIUM_SIZE = 16
+    BIGGER_SIZE = 18
+
+    plt.rc('font', size=MEDIUM_SIZE)          # controls default text sizes
+    plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+    fig1, ((bx)) = plt.subplots(1, 1, layout="constrained")
+    
+    data_2 = []
+    data_4 = []
+    data_6 = []
+    X = []
+
+    data = {2: data_2, 4: data_4, 6: data_6}
+    
+    #loop through the prospective block sizes
+    for i in range(5, 36, 1):
+        #calculate zone bits per second
+        zone_bits = 5
+        zone_bps = zone_bits / i
+
+        #loop through the posible "bits used per timestamp"
+        for time_bits in [2, 4, 6]:
+            event_bps = events * (4+time_bits)
+
+            total_bps = zone_bps + event_bps
+
+            data[time_bits].append(total_bps)
+
+        X.append(i)
+
+
+    bx.plot(X, data_2, color='#d55e00')
+    bx.plot(X, data_4, color='#f0e442')
+    bx.plot(X, data_6, color='#0072b2')
+
+    bx.legend(['2 bits per timestamp', '4 bits per timestamp','6 bits per timestamp'])
+    #bx.legend(['Normal', 'Adversary'])
+    
+    bx.set_xlabel("Block Length (seconds)")
+    bx.set_ylabel("Bits generated per second")
+
+    fig1.savefig('figures/bits-per-second.png', dpi = 300, bbox_inches='tight')
+    plt.show()
+
 if __name__ == "__main__":
     #graphs_zone_parameters()
     graphs_old()
     #graph_block_size()
     #graphs_normal_time_resolution_block_size()
+    #graphs_bps()
+
+    #print(events_per_second(["data-files/1690392483_platoon2_rear.csv"]))
+
     #front_normal = "data-files/data_front_ultrawide.csv"
     #rear_normal = "data-files/data_rear_ultrawide.csv"
     #front_zone = 'data-zone/data_front_ultrawide_zone.csv'
