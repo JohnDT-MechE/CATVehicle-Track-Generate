@@ -1,4 +1,4 @@
-# Tracking and Counting
+# Theia Continuos Cyber-Physical Trust Renewal
 # Being used by CAT Vehicle Group 2
 # Written by John, Max, and Adhith
 # Last updated 3 August 2023
